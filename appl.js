@@ -1,25 +1,21 @@
-
 var http = require('http'),
     crypto = require('crypto');
 	
 http.createServer(function (req,clientRes) {
-
   var postBody = "",
-      cipher = crypto.createCipher('aes192',"secret1234");
+      cipher = crypto.createCipher('aes192',"secret1234"),
+	  msg = [];
   
-  clientRes.writeHead(200,{'Content-Type': 'text/plain'});
-  
+  clientRes.writeHead(200,{'Content-Type': 'text/plain'}); 
   req.setEncoding('utf8');
   req.on('data',function(data){
   	postBody = postBody + data;
   });
   req.on('end',function(){
-     var reqOptions = JSON.parse(postBody);
+     var reqOptions = JSON.parse(postBody),
+	     getURL = "http://" + reqOptions.hostname + reqOptions.path ;
      
-	 http.get("http://itam.hbl.local",function(res){
-		console.log("Got response: " + res.statusCode);
-		
-		res.setEncoding('utf8');
+	 http.get(getURL,function(res){
 		res.on('data',function(chunk) {
 			clientRes.write(cipher.update(chunk,'binary','hex'));
 		});
