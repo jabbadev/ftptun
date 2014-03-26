@@ -18,7 +18,7 @@ http.createServer(function (req,clientRes) {
      var reqOptions = JSON.parse(postBody),
 	     getURL = "http://" + reqOptions.hostname + reqOptions.path ;
      
-	 log.console('Req to: ' + getURL );
+	 console.log('Req to: ' + getURL );
 	 http.get(getURL,function(res){
 		res.on('data',function(chunk) {
 			clientRes.write(cipher.update(chunk,'binary','hex'));
