@@ -6,11 +6,12 @@ var crypto = require('crypto'),
 	outStream = fs.createWriteStream('output'),
 	msg = [];
 
-process.stdin.setEncoding('ascii');
+process.stdin.setEncoding('hex');
 process.stdin.on('readable', function(chunk) {
-  var chunk = process.stdin.read();
-  if (chunk !== null) {
-    msg.push(deipher.update(chunk,'hex','binary'));
+  
+  while(null !== (chunk = process.stdin.read() )) {
+  	 var cb = new Buffer(chunk,'hex');
+    msg.push(deipher.update(cb,'hex','binary'));
   }
 });
 
