@@ -1,3 +1,4 @@
+#!/bin/env node
 
 var crypto = require('crypto'),
     deipher = crypto.createDecipher('aes192',"secret1234")
