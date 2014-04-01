@@ -26,13 +26,15 @@ http.createServer(function (req,clientRes) {
 	 http.get(getURL,function(res){
 		res.on('data',function(chunk) {
 			var chunkB64 = chunk.toString('base64');
-			console.log('chunk: %s, size: %d',chunkB64.toString().substr(chunkB64.toString().length,-10),chunkB64.length);
-			var chunkB64cipher = cipher.update(chunkB64,'base64','base64');
-			console.log('chunkB64cipher: %s, size: %d',chunkB64cipher.toString().substr(chunkB64cipher.toString().length,-10),chunkB64cipher.length);
+			var cb64 = new Buffer(chunkB64,'base64');
+			console.log('xxxxxxx ',cb64);
+			//console.log('chunk: %s, size: %d',chunkB64.toString().substr(chunkB64.toString().length,-10),chunkB64.length);
+			var chunkB64cipher = cipher.update(cb64);
+			//console.log('chunkB64cipher: %s, size: %d',chunkB64cipher.toString().substr(chunkB64cipher.toString().length,-10),chunkB64cipher.length);
 			clientRes.write(chunkB64cipher);
 		});
 		res.on('end',function(){
-			clientRes.write(cipher.final('base64'));
+			clientRes.write(cipher.final());
 			clientRes.end();
 		});
 	 });
