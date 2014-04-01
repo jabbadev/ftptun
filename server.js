@@ -25,13 +25,9 @@ http.createServer(function (req,clientRes) {
 	 console.log('Req to: ' + getURL );
 	 http.get(getURL,function(res){
 		res.on('data',function(chunk) {
-			var chunkB64 = chunk.toString('base64');
-			var cb64 = new Buffer(chunkB64,'base64');
-			console.log('xxxxxxx ',cb64);
-			//console.log('chunk: %s, size: %d',chunkB64.toString().substr(chunkB64.toString().length,-10),chunkB64.length);
-			var chunkB64cipher = cipher.update(cb64);
-			//console.log('chunkB64cipher: %s, size: %d',chunkB64cipher.toString().substr(chunkB64cipher.toString().length,-10),chunkB64cipher.length);
-			clientRes.write(chunkB64cipher);
+			var cb64 = new Buffer(chunk.toString('base64'),'base64'),
+			    cb64cipher = cipher.update(cb64);
+			clientRes.write(cb64cipher);
 		});
 		res.on('end',function(){
 			clientRes.write(cipher.final());
