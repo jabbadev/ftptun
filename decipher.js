@@ -1,20 +1,18 @@
 #!/bin/env node
 
 var crypto = require('crypto'),
-    deipher = crypto.createDecipher('aes192',"secret1234")
+    deipher = crypto.createDecipher('aes-256-cbc',"secret1234")
 	fs = require('fs'),
-	outStream = fs.createWriteStream('output'),
-	msg = [];
+	outStream = fs.createWriteStream('output.bin',{ encoding: "binary" }),
+	msg = "";
 
-process.stdin.setEncoding('ascii');
-process.stdin.on('readable', function(chunk) {
-  var chunk = process.stdin.read();
-  if (chunk !== null) {
-    msg.push(deipher.update(chunk,'hex','binary'));
-  }
+process.stdin.on('data', function(chunk) {
+	var chunkB64 = deipher.update(chunk);
+	outStream.write(new Buffer(chunkB64,'base64'));
 });
 
 process.stdin.on('end', function() {
-  msg.push(deipher.final('binary'));
-  fs.appendFile('output',msg.join());
+  var chunkB64 = deipher.final();
+  outStream.write(new Buffer(chunkB64,'base64'));
+  outStream.close();
 });

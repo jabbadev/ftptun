@@ -6,11 +6,13 @@ var http = require('http'),
 var ipaddr  = process.env.OPENSHIFT_NODEJS_IP || "127.0.0.1";
 var port    = process.env.OPENSHIFT_NODEJS_PORT || 1337;
 	
+	
+
 http.createServer(function (req,clientRes) {
   var postBody = "",
-      cipher = crypto.createCipher('aes192',"secret1234"),
+      cipher = crypto.createCipher('aes-256-cbc',"secret1234"),
 	  msg = [];
-  
+	  
   clientRes.writeHead(200,{'Content-Type': 'text/plain'}); 
   req.setEncoding('utf8');
   req.on('data',function(data){
@@ -23,10 +25,12 @@ http.createServer(function (req,clientRes) {
 	 console.log('Req to: ' + getURL );
 	 http.get(getURL,function(res){
 		res.on('data',function(chunk) {
-			clientRes.write(cipher.update(chunk,'binary','hex'));
+			var cb64 = new Buffer(chunk.toString('base64'),'base64'),
+			    cb64cipher = cipher.update(cb64);
+			clientRes.write(cb64cipher);
 		});
 		res.on('end',function(){
-			clientRes.write(cipher.final('hex'));
+			clientRes.write(cipher.final());
 			clientRes.end();
 		});
 	 });
