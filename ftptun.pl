@@ -4,6 +4,7 @@ use strict;
 use LWP::UserAgent;
 use Getopt::Long;
 use Pod::Usage;
+use URI::URL;
 
 ##### Global var #####
 my $browser = LWP::UserAgent->new();
@@ -22,6 +23,8 @@ sub checkOpt () {
 
 	if ( ! $opt{out} ) {
 		my $uri = URI->new( $opt{fileURL} );
+		my $reqURL = new URI::URL($opt{fileURL});
+		
 		my @tmp = split("/",$uri->path());
 		$opt{out} = pop @tmp;
 	}
