@@ -9,10 +9,8 @@ var http = require('http'),
 
 http.createServer(function (req,clientRes) {
   var postBody = "",
-      cipher = crypto.createCipher('aes-256-cbc',"secret1234"),
-	  msg = [];
+      cipher = crypto.createCipher('aes-256-cbc',"secret1234");
 	  
-  //clientRes.writeHead(200,{'Content-Type': 'text/plain'}); 
   req.setEncoding('utf8');
   req.on('data',function(data){
   	postBody = postBody + data;
