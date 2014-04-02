@@ -1,0 +1,163 @@
+#!/usr/bin/perl
+
+use strict;
+use LWP::UserAgent;
+use Getopt::Long;
+use Pod::Usage;
+
+##### Global var #####
+my $browser = LWP::UserAgent->new();
+$browser->env_proxy();
+$browser->agent("curl/7.35.0");
+
+my %opt = ( csize => "5M",
+	    fileURL => "" );
+
+GetOptions( \%opt, "csize=s", "-out=s", "fielURL=s", "man", "help" ) || pod2usage(2);
+
+##### Function #######
+sub checkOpt () {
+	pod2usage( -exitstatus => 1, -verbose => 0 ) if( ! $ARGV[0] );
+	$opt{fileURL} = $ARGV[0];
+
+	if ( ! $opt{out} ) {
+		my $uri = URI->new( $opt{fileURL} );
+		my @tmp = split("/",$uri->path());
+		$opt{out} = pop @tmp;
+	}
+
+	$opt{csize} =~ s/M|m$//;
+	$opt{csize} = $opt{csize} * 1024000;
+}
+
+sub openLFile () {
+	open( $opt{ofs} ,"> $opt{out}") || die "SYS ERROR: $!";	
+}
+
+sub closeLFile () {
+	close($opt{ofs}) || die "SYS ERROR: $!";
+}
+
+sub getFileSize {
+	my $req = HTTP::Request->new( HEAD => $opt{fileURL} );
+	my $res = $browser->request($req);
+	if ($res->is_success) {
+		return $res->headers()->content_length();
+	}
+	else {
+		die "HTTP ERROR: " . $res->status_line();
+	}
+}
+
+sub getChunkFile {
+	my $range = shift;
+
+	my $req = HTTP::Request->new(GET => $opt{fileURL} );
+	$req->header(Range => "bytes=$range" );
+	$req->header( "Cache-Control" => "no-store");
+	my $res = $browser->request($req);
+ 
+	#Gestione a chunk separati
+	#open(F,"> chunk.$range");
+
+	if ($res->is_success) {
+		#Gestione a chunk separati
+		#print  F $res->content;
+		my $file = $opt{ofs};
+		print $file $res->content;
+	}
+	else {
+		die "HTTP ERROR: ",$res->status_line, "\n";
+	}
+
+	#Gestione a chunk separati
+	#close(F);
+}
+
+sub getFile {
+ 	my $chunkNum = int($opt{fsize} / $opt{csize});
+ 	my $chunkRes = $opt{fsize} % $opt{csize};
+ 	my $chunkStart = 0;
+ 	my $chunkStop = 0;
+	my $i = 0;
+
+	my $vchunkNum = $chunkNum; # $vchunkNum serve solo per la visualizzazione del msg.
+	$vchunkNum = $chunkNum + 1 if ( $chunkRes );
+	
+ 	for( $i = 0; $i != $chunkNum ; $i++ ) {
+		print "chunk ",$i + 1,"/$vchunkNum\n";
+
+		$chunkStop = (($opt{csize}*($i+1))-1);
+ 		getChunkFile( "$chunkStart-$chunkStop" );
+ 		$chunkStart = $chunkStop + 1;
+ 	}
+ 	
+ 	if ( $chunkRes ) {
+		print "chunk ",$i + 1,"/$vchunkNum\n";
+
+ 		getChunkFile("$chunkStart-$opt{fsize}");
+ 	}
+}
+
+sub showMsg {
+	print "Downloading ...\n";
+	print "\nfileURL   : ",$opt{fileURL},"\n";
+	print "out file  : ",$opt{out},"\n";
+	print "chunk size: ",$opt{csize},"\n";
+	print "file size : ",$opt{fsize},"\n";
+}
+
+##### Main ###########
+
+checkOpt();
+$opt{fsize} = getFileSize();
+showMsg();
+
+openLFile();
+getFile();
+closeLFile();
+
+ __END__
+
+=head1 NAME
+
+fuckTheProxy
+
+=head1 SYNOPSIS
+
+fuckTheProxy [ option ] file URL
+
+Options:
+-help            sintassi
+-man             man page
+-csize [ size in M ]
+-out  [ file name ].
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-help>
+
+Sintassi del comando.
+
+=item B<-man>
+
+Stampa il manuale del prodotto.
+
+=item B<-csize>
+
+Chunk size espressa in Mega default 5M.
+
+=item B<-out>
+
+Specifica il nome del file da assegnare al file locale. Di default viene
+
+=back
+
+=head1 DESCRIPTION
+
+B<fuckTheProxy> Utility per eseguire i download superando i limiti imposti dal proxy su: grandezza dei file in download e numero di
+file contenuti in un archivio.
+
+=cut
