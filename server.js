@@ -17,9 +17,9 @@ http.createServer(function (req,clientRes) {
   });
   req.on('end',function(){
      var reqOptions = JSON.parse(postBody),
-	     getURL = "http://" + reqOptions.hostname + reqOptions.path ;
+	     getURL = reqOptions.method + " http://" + reqOptions.hostname + reqOptions.path ;
      
-	console.log('Req to: ' + getURL );
+	console.log('Req: %s', getURL );
 	
 	if ( reqOptions.method == "HEAD" ) {
 		var req = http.request(reqOptions,function(res){

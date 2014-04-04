@@ -23,7 +23,6 @@ sub checkOpt () {
 
 	if ( ! $opt{out} ) {
 		my $uri = URI->new( $opt{fileURL} );
-		my $reqURL = new URI::URL($opt{fileURL});
 		
 		my @tmp = split("/",$uri->path());
 		$opt{out} = pop @tmp;
@@ -42,9 +41,17 @@ sub closeLFile () {
 }
 
 sub getFileSize {
-	my $req = HTTP::Request->new( HEAD => $opt{fileURL} );
+	my $reqURL = new URI::URL($opt{fileURL});
+	my $postBody = '{ "method": "HEAD" , "hostname": "'.$reqURL->host().'", "path": "'.$reqURL->path().'" }';
+
+	my $req = HTTP::Request->new( POST => "http://127.0.0.1:1337/" );
+	$req->header( 'Content-Type' => 'application/json' );
+	$req->content( $postBody );
 	my $res = $browser->request($req);
+	
+	print "CONTENT-LENGTH: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
 	if ($res->is_success) {
+		print "CONTENT-LENGTH: ",$res->headers()->content_length();
 		return $res->headers()->content_length();
 	}
 	else {
