@@ -49,7 +49,6 @@ sub getFileSize {
 	$req->content( $postBody );
 	my $res = $browser->request($req);
 	
-	print "CONTENT-LENGTH: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
 	if ($res->is_success) {
 		print "CONTENT-LENGTH: ",$res->headers()->content_length();
 		return $res->headers()->content_length();

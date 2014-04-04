@@ -23,7 +23,10 @@ http.createServer(function (req,clientRes) {
 	
 	if ( reqOptions.method == "HEAD" ) {
 		var req = http.request(reqOptions,function(res){
-			res.on('end',function(){clientRes.writeHead(200,{'Content-Length': res.headers['content-length']})});
+			res.on('end',function(){
+				clientRes.writeHead(200,{'Content-Length': res.headers['content-length']});
+				clientRes.end();
+			});
 		});
 		req.end();
 	}
