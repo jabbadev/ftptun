@@ -21,7 +21,6 @@ my $FTPTUN_CONFIG = "$ENV{HOME}/.config/ftptun/client.conf";
 
 open(FTPTUN_CONFIG,$FTPTUN_CONFIG);
 my $ftptunConfig = from_json(join("",<FTPTUN_CONFIG>));
-print $ftptunConfig->{'server'};
 close(FTPTUN_CONFIG);
 
 ##### Function #######
@@ -77,7 +76,7 @@ sub getChunkFile {
 	my $res = $browser->request($req);
  
 	my $CHUNK_FILE = $ftptunConfig->{'tmpdir'} . "/chunk" .$range;
-	my $DECIPHER_CMD = "./decipher.js  $CHUNK_FILE";
+	my $DECIPHER_CMD = $ftptunConfig->{'decipher'}." $CHUNK_FILE";
 	open(my $decipher,"|-",$DECIPHER_CMD);
 
 	if ($res->is_success) {
