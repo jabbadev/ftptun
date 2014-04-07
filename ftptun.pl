@@ -50,7 +50,6 @@ sub getFileSize {
 	my $res = $browser->request($req);
 	
 	if ($res->is_success) {
-		print "CONTENT-LENGTH: ",$res->header('Resource-Content-Length');
 		return $res->header('Resource-Content-Length');
 	}
 	else {
@@ -60,27 +59,34 @@ sub getFileSize {
 
 sub getChunkFile {
 	my $range = shift;
-
-	my $req = HTTP::Request->new(GET => $opt{fileURL} );
+	my $reqURL = new URI::URL($opt{fileURL});
+	my $postBody = '{ "method": "GET" , "hostname": "'.$reqURL->host().'", "path": "'.$reqURL->path().'" }';
+	
+	my $req = HTTP::Request->new(POST => "http://127.0.0.1:1337/");
 	$req->header(Range => "bytes=$range" );
-	$req->header( "Cache-Control" => "no-store");
+	$req->header("Cache-Control" => "no-store");
+	$req->content( $postBody );
 	my $res = $browser->request($req);
  
-	#Gestione a chunk separati
-	#open(F,"> chunk.$range");
+	my $CHUNK_FILE = "chunk".$range;
+	my $DECIPHER_CMD = "./decipher.js  chunk".$range;
+	open(my $decipher,"|-",$DECIPHER_CMD);
 
 	if ($res->is_success) {
-		#Gestione a chunk separati
-		#print  F $res->content;
-		my $file = $opt{ofs};
-		print $file $res->content;
+		print $decipher $res->content;
 	}
 	else {
 		die "HTTP ERROR: ",$res->status_line, "\n";
 	}
+	close($decipher);
 
-	#Gestione a chunk separati
-	#close(F);
+	my $file = $opt{ofs};
+	open(CHUNK_FILE,$CHUNK_FILE);
+	binmode(CHUNK_FILE);
+	print $file <CHUNK_FILE>;
+	close(CHUNK_FILE);
+	
+	unlink $CHUNK_FILE;
 }
 
 sub getFile {
