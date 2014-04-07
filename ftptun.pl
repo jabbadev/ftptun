@@ -17,7 +17,8 @@ my %opt = ( csize => "5M",
 
 GetOptions( \%opt, "csize=s", "-out=s", "fielURL=s", "man", "help" ) || pod2usage(2);
 
-my $FTPTUN_CONFIG = "$ENV{HOME}/.config/ftptun/client.conf";
+#my $FTPTUN_CONFIG = "$ENV{HOME}/.config/ftptun/client.conf";
+my $FTPTUN_CONFIG = "/etc/ftptun/client.conf";
 
 open(FTPTUN_CONFIG,$FTPTUN_CONFIG);
 my $ftptunConfig = from_json(join("",<FTPTUN_CONFIG>));
