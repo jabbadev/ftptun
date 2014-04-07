@@ -4,6 +4,8 @@ use strict;
 use LWP::UserAgent;
 use Getopt::Long;
 use Pod::Usage;
+use URI::URL;
+use JSON;
 
 ##### Global var #####
 my $browser = LWP::UserAgent->new();
@@ -15,6 +17,13 @@ my %opt = ( csize => "5M",
 
 GetOptions( \%opt, "csize=s", "-out=s", "fielURL=s", "man", "help" ) || pod2usage(2);
 
+my $FTPTUN_CONFIG = "$ENV{HOME}/.config/ftptun/client.conf";
+
+open(FTPTUN_CONFIG,$FTPTUN_CONFIG);
+my $ftptunConfig = from_json(join("",<FTPTUN_CONFIG>));
+print $ftptunConfig->{'server'};
+close(FTPTUN_CONFIG);
+
 ##### Function #######
 sub checkOpt () {
 	pod2usage( -exitstatus => 1, -verbose => 0 ) if( ! $ARGV[0] );
@@ -22,6 +31,7 @@ sub checkOpt () {
 
 	if ( ! $opt{out} ) {
 		my $uri = URI->new( $opt{fileURL} );
+		
 		my @tmp = split("/",$uri->path());
 		$opt{out} = pop @tmp;
 	}
@@ -39,10 +49,16 @@ sub closeLFile () {
 }
 
 sub getFileSize {
-	my $req = HTTP::Request->new( HEAD => $opt{fileURL} );
+	my $reqURL = new URI::URL($opt{fileURL});
+	my $postBody = '{ "method": "HEAD" , "hostname": "'.$reqURL->host().'", "path": "'.$reqURL->path().'" }';
+
+	my $req = HTTP::Request->new( POST => $ftptunConfig->{'server'} );
+	$req->header( 'Content-Type' => 'application/json' );
+	$req->content( $postBody );
 	my $res = $browser->request($req);
+	
 	if ($res->is_success) {
-		return $res->headers()->content_length();
+		return $res->header('Resource-Content-Length');
 	}
 	else {
 		die "HTTP ERROR: " . $res->status_line();
@@ -51,27 +67,33 @@ sub getFileSize {
 
 sub getChunkFile {
 	my $range = shift;
-
-	my $req = HTTP::Request->new(GET => $opt{fileURL} );
+	my $reqURL = new URI::URL($opt{fileURL});
+	my $postBody = '{ "method": "GET" , "hostname": "'.$reqURL->host().'", "path": "'.$reqURL->path().'" }';
+	
+	my $req = HTTP::Request->new(POST => $ftptunConfig->{'server'});
 	$req->header(Range => "bytes=$range" );
-	$req->header( "Cache-Control" => "no-store");
+	$req->header("Cache-Control" => "no-store");
+	$req->content( $postBody );
 	my $res = $browser->request($req);
  
-	#Gestione a chunk separati
-	#open(F,"> chunk.$range");
+	my $CHUNK_FILE = $ftptunConfig->{'tmpdir'} . "/chunk" .$range;
+	my $DECIPHER_CMD = "./decipher.js  $CHUNK_FILE";
+	open(my $decipher,"|-",$DECIPHER_CMD);
 
 	if ($res->is_success) {
-		#Gestione a chunk separati
-		#print  F $res->content;
-		my $file = $opt{ofs};
-		print $file $res->content;
+		print $decipher $res->content;
 	}
 	else {
 		die "HTTP ERROR: ",$res->status_line, "\n";
 	}
+	close($decipher);
 
-	#Gestione a chunk separati
-	#close(F);
+	my $file = $opt{ofs};
+	open(CHUNK_FILE,$CHUNK_FILE);
+	binmode(CHUNK_FILE);
+	print $file <CHUNK_FILE>;
+	close(CHUNK_FILE);
+	unlink $CHUNK_FILE;
 }
 
 sub getFile {
@@ -121,11 +143,11 @@ closeLFile();
 
 =head1 NAME
 
-fuckTheProxy
+ftptun
 
 =head1 SYNOPSIS
 
-fuckTheProxy [ option ] file URL
+ftptun [ option ] file URL
 
 Options:
 -help            sintassi
@@ -157,7 +179,7 @@ Specifica il nome del file da assegnare al file locale. Di default viene
 
 =head1 DESCRIPTION
 
-B<fuckTheProxy> Utility per eseguire i download superando i limiti imposti dal proxy su: grandezza dei file in download e numero di
+B<ftptun> Utility per eseguire i download superando i limiti imposti dal proxy su: grandezza dei file in download e numero di
 file contenuti in un archivio.
 
 =cut
