@@ -50,8 +50,8 @@ sub getFileSize {
 	my $res = $browser->request($req);
 	
 	if ($res->is_success) {
-		print "CONTENT-LENGTH: ",$res->headers()->content_length();
-		return $res->headers()->content_length();
+		print "CONTENT-LENGTH: ",$res->header('Resource-Content-Length');
+		return $res->header('Resource-Content-Length');
 	}
 	else {
 		die "HTTP ERROR: " . $res->status_line();

@@ -16,15 +16,17 @@ http.createServer(function (req,clientRes) {
   	postBody = postBody + data;
   });
   req.on('end',function(){
-     var reqOptions = JSON.parse(postBody),
-	     getURL = reqOptions.method + " http://" + reqOptions.hostname + reqOptions.path ;
-     
+	var reqOptions = "", getURL = ""; 
+    
+	reqOptions = JSON.parse(postBody);
+	getURL = reqOptions.method + " http://" + reqOptions.hostname + reqOptions.path; 
 	console.log('Req: %s', getURL );
 	
 	if ( reqOptions.method == "HEAD" ) {
 		var req = http.request(reqOptions,function(res){
+			res.on('data',function(data){});
 			res.on('end',function(){
-				clientRes.writeHead(200,{'Content-Length': res.headers['content-length']});
+				clientRes.writeHead(200,{'Resource-Content-Length': res.headers['content-length'], 'Content-Length': 0 });
 				clientRes.end();
 			});
 		});
