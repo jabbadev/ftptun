@@ -5,6 +5,7 @@ use LWP::UserAgent;
 use Getopt::Long;
 use Pod::Usage;
 use URI::URL;
+use JSON;
 
 ##### Global var #####
 my $browser = LWP::UserAgent->new();
@@ -15,6 +16,13 @@ my %opt = ( csize => "5M",
 	    fileURL => "" );
 
 GetOptions( \%opt, "csize=s", "-out=s", "fielURL=s", "man", "help" ) || pod2usage(2);
+
+my $FTPTUN_CONFIG = "$ENV{HOME}/.config/ftptun/client.conf";
+
+open(FTPTUN_CONFIG,$FTPTUN_CONFIG);
+my $ftptunConfig = from_json(join("",<FTPTUN_CONFIG>));
+print $ftptunConfig->{'server'};
+close(FTPTUN_CONFIG);
 
 ##### Function #######
 sub checkOpt () {
@@ -44,7 +52,7 @@ sub getFileSize {
 	my $reqURL = new URI::URL($opt{fileURL});
 	my $postBody = '{ "method": "HEAD" , "hostname": "'.$reqURL->host().'", "path": "'.$reqURL->path().'" }';
 
-	my $req = HTTP::Request->new( POST => "http://127.0.0.1:1337/" );
+	my $req = HTTP::Request->new( POST => $ftptunConfig->{'server'} );
 	$req->header( 'Content-Type' => 'application/json' );
 	$req->content( $postBody );
 	my $res = $browser->request($req);
@@ -62,14 +70,14 @@ sub getChunkFile {
 	my $reqURL = new URI::URL($opt{fileURL});
 	my $postBody = '{ "method": "GET" , "hostname": "'.$reqURL->host().'", "path": "'.$reqURL->path().'" }';
 	
-	my $req = HTTP::Request->new(POST => "http://127.0.0.1:1337/");
+	my $req = HTTP::Request->new(POST => $ftptunConfig->{'server'});
 	$req->header(Range => "bytes=$range" );
 	$req->header("Cache-Control" => "no-store");
 	$req->content( $postBody );
 	my $res = $browser->request($req);
  
-	my $CHUNK_FILE = "chunk".$range;
-	my $DECIPHER_CMD = "./decipher.js  chunk".$range;
+	my $CHUNK_FILE = $ftptunConfig->{'tmpdir'} . "/chunk" .$range;
+	my $DECIPHER_CMD = "./decipher.js  $CHUNK_FILE";
 	open(my $decipher,"|-",$DECIPHER_CMD);
 
 	if ($res->is_success) {
@@ -85,7 +93,6 @@ sub getChunkFile {
 	binmode(CHUNK_FILE);
 	print $file <CHUNK_FILE>;
 	close(CHUNK_FILE);
-	
 	unlink $CHUNK_FILE;
 }
 
@@ -136,11 +143,11 @@ closeLFile();
 
 =head1 NAME
 
-fuckTheProxy
+ftptun
 
 =head1 SYNOPSIS
 
-fuckTheProxy [ option ] file URL
+ftptun [ option ] file URL
 
 Options:
 -help            sintassi
@@ -172,7 +179,7 @@ Specifica il nome del file da assegnare al file locale. Di default viene
 
 =head1 DESCRIPTION
 
-B<fuckTheProxy> Utility per eseguire i download superando i limiti imposti dal proxy su: grandezza dei file in download e numero di
+B<ftptun> Utility per eseguire i download superando i limiti imposti dal proxy su: grandezza dei file in download e numero di
 file contenuti in un archivio.
 
 =cut
