@@ -105,7 +105,7 @@ sub getChunkFile {
 	binmode(CHUNK_FILE);
 	print $file <CHUNK_FILE>;
 	close(CHUNK_FILE);
-	#unlink $CHUNK_FILE;
+	unlink $CHUNK_FILE;
 }
 
 sub getFile {

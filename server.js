@@ -24,7 +24,6 @@ http.createServer(function (req,clientRes) {
     
 	reqOptions = JSON.parse(postBody);
 	getURL = reqOptions.method + " http://" + reqOptions.hostname + reqOptions.path; 
-	//console.log('Req: %s Range: [ %s ]', getURL, rangeHeader );
 	
 	if ( reqOptions.method == "HEAD" ) {
 		console.log('Req: %s', getURL );
