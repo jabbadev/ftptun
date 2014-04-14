@@ -35,7 +35,7 @@ http.createServer(function (req,clientRes) {
 		req.end();
 	}
 	else {
-		clientRes.writeHead(200,{'Content-Type': 'text/plain'}); 
+		//clientRes.writeHead(200,{'Content-Type': 'text/plain'}); 
 		if ( rangeHeader && cacheControl ){
 			reqOptions.headers = { 'range': rangeHeader, 'cache-control': cacheControl };
 		}
@@ -47,7 +47,9 @@ http.createServer(function (req,clientRes) {
 				clientRes.write(cb64cipher);
 			});
 			res.on('end',function(){
-				var cb64cipher = cipher.final();
+				var cb64cipher = cipher.final(), respHeader = {'Content-Type':'text/plain'};
+				if ( rangeHeader && cacheControl ){ respHeader['Resource-Range'] = rangeHeader }
+				clientRes.writeHead(200,respHeader);
 				clientRes.end(cb64cipher);
 			});
 		});

@@ -6,6 +6,7 @@ use Getopt::Long;
 use Pod::Usage;
 use URI::URL;
 use JSON;
+use Cwd;
 
 ##### Global var #####
 my $browser = LWP::UserAgent->new();
@@ -18,8 +19,17 @@ my %opt = ( csize => "5M",
 GetOptions( \%opt, "csize=s", "-out=s", "fielURL=s", "man", "help" ) || pod2usage(2);
 
 my $FTPTUN_CONFIG = "/etc/ftptun/client.conf";
-if ( -e "$ENV{HOME}/.config/ftptun/client.conf" ) {
-	$FTPTUN_CONFIG = "$ENV{HOME}/.config/ftptun/client.conf";
+
+my $cwdDir = getcwd;
+print $cwdDir;
+
+if ( -e getcwd . "/client.conf" ) {
+	$FTPTUN_CONFIG = getcwd . "/client.conf";
+}
+else {
+	if ( -e "$ENV{HOME}/.config/ftptun/client.conf" ) {
+		$FTPTUN_CONFIG = "$ENV{HOME}/.config/ftptun/client.conf";
+	}
 }
 
 open(FTPTUN_CONFIG,$FTPTUN_CONFIG);
@@ -95,7 +105,7 @@ sub getChunkFile {
 	binmode(CHUNK_FILE);
 	print $file <CHUNK_FILE>;
 	close(CHUNK_FILE);
-	unlink $CHUNK_FILE;
+	#unlink $CHUNK_FILE;
 }
 
 sub getFile {
