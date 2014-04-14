@@ -10,9 +10,11 @@ var http = require('http'),
 http.createServer(function (req,clientRes) {
   var postBody = "",
       cipher = crypto.createCipher('aes-256-cbc',"secret1234"),
-	  rangeHeader = req.headers['range'],
-	  cacheControl = req.headers['cache-control']; 
+	  rangeHeader = null,
+	  cacheControl = null; 
   
+  rangeHeader = req.headers['range'];
+  cacheControl = req.headers['cache-control'];
   req.setEncoding('utf8');
   req.on('data',function(data){
   	postBody = postBody + data;
@@ -22,9 +24,10 @@ http.createServer(function (req,clientRes) {
     
 	reqOptions = JSON.parse(postBody);
 	getURL = reqOptions.method + " http://" + reqOptions.hostname + reqOptions.path; 
-	console.log('Req: %s', getURL );
+	//console.log('Req: %s Range: [ %s ]', getURL, rangeHeader );
 	
 	if ( reqOptions.method == "HEAD" ) {
+		console.log('Req: %s', getURL );
 		req = http.request(reqOptions,function(res){
 			res.on('data',function(data){});
 			res.on('end',function(){
@@ -35,7 +38,9 @@ http.createServer(function (req,clientRes) {
 		req.end();
 	}
 	else {
-		//clientRes.writeHead(200,{'Content-Type': 'text/plain'}); 
+		console.log('Req: %s Range: [ %s ]', getURL, rangeHeader );
+	
+		clientRes.writeHead(200,{'Content-Type': 'text/plain'}); 
 		if ( rangeHeader && cacheControl ){
 			reqOptions.headers = { 'range': rangeHeader, 'cache-control': cacheControl };
 		}
@@ -48,8 +53,8 @@ http.createServer(function (req,clientRes) {
 			});
 			res.on('end',function(){
 				var cb64cipher = cipher.final(), respHeader = {'Content-Type':'text/plain'};
-				if ( rangeHeader && cacheControl ){ respHeader['Resource-Range'] = rangeHeader }
-				clientRes.writeHead(200,respHeader);
+				//if ( rangeHeader && cacheControl ){ respHeader['Resource-Range'] = rangeHeader }
+				//clientRes.writeHead(200,respHeader);
 				clientRes.end(cb64cipher);
 			});
 		});
