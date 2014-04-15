@@ -83,8 +83,8 @@ sub getChunkFile {
 	my $postBody = '{ "method": "GET" , "hostname": "'.$reqURL->host().'", "path": "'.$reqURL->path().'" }';
 	
 	my $req = HTTP::Request->new(POST => $ftptunConfig->{'server'});
-	$req->header(Range => "bytes=$range" );
-	$req->header("Cache-Control" => "no-store");
+	$req->header( "x-range" => "bytes=$range" );
+	$req->header( "x-cache-control" => "no-store");
 	$req->content( $postBody );
 	my $res = $browser->request($req);
  
@@ -105,7 +105,7 @@ sub getChunkFile {
 	binmode(CHUNK_FILE);
 	print $file <CHUNK_FILE>;
 	close(CHUNK_FILE);
-	unlink $CHUNK_FILE;
+	#unlink $CHUNK_FILE;
 }
 
 sub getFile {

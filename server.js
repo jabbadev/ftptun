@@ -13,8 +13,9 @@ http.createServer(function (req,clientRes) {
 	  rangeHeader = null,
 	  cacheControl = null; 
   
-  rangeHeader = req.headers['range'];
-  cacheControl = req.headers['cache-control'];
+  console.log(req.headers);
+  rangeHeader = req.headers['x-range'];
+  cacheControl = req.headers['x-cache-control'];
   req.setEncoding('utf8');
   req.on('data',function(data){
   	postBody = postBody + data;
@@ -51,9 +52,7 @@ http.createServer(function (req,clientRes) {
 				clientRes.write(cb64cipher);
 			});
 			res.on('end',function(){
-				var cb64cipher = cipher.final(), respHeader = {'Content-Type':'text/plain'};
-				//if ( rangeHeader && cacheControl ){ respHeader['Resource-Range'] = rangeHeader }
-				//clientRes.writeHead(200,respHeader);
+				var cb64cipher = cipher.final();
 				clientRes.end(cb64cipher);
 			});
 		});
