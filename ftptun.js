@@ -1,31 +1,10 @@
 #!/bin/env node
 
-var fs = require('fs'), 
-	FTPTUN_CONFIG = { 
-		'system': "/etc/ftptun/client.conf",
-		'user': process.env['HOME'] + "/.config/ftptun/client.conf",
-		'local': process.cwd() + "/client.conf" },
-	config = null,
-	cf = null;
+var Conf = require('./lib/config.js');
 
-fs.readFile(FTPTUN_CONFIG['local'],function (err,data) {
-	if (err) {
-		fs.readFile(FTPTUN_CONFIG['user'], function (err,data) {
-			if( err ){
-				fs.readFile(FTPTUN_CONFIG['system'], function (err,data) {
-					if(err)throw err;
-					
-					Main(JSON.parse(data));
-				});
-			}
-			else {
-				Main(JSON.parse(data));
-			}
-		});
-	}
-	else {
-		ParseCmdParams(Main,JSON.parse(data));
-	}
+clientConf = new Conf();
+clientConf.on('load',function(){
+	console.log('xxxx');
 });
 
 function ParseCmdParams(mainCallBack,config) {
