@@ -1,31 +1,19 @@
 #!/bin/env node
 
-var Conf = require('./lib/config.js');
+var Config = require('./lib/clientInit.js'),
+	Downloader = require('./lib/downloader.js')
+	finish = false,
 
-clientConf = new Conf();
-clientConf.on('load',function(){
-	console.log('xxxx');
-});
+clientConf = new Config();
+clientConf.loadConfig(Main);
+//clientConf.on('load',Main);
 
-function ParseCmdParams(mainCallBack,config) {
-	var cmdopt = {}, argv = process.argv.slice(2);
+function Main(conf){
+	var downloader = new Downloader(conf,process.argv[2]);
+	console.log(downloader.toString());
 	
-	argv.forEach(
-		function(item,i){
-			console.log(item,i,argv.length);
-			if( argv.length-1 == i ) {
-				mainCallBack(cmdopt,config);
-			}
-		}
-	);
+	process.exit();
 }
-
-function Main(cmdopt,config){
-	console.log(cmdopt,config);
-}
-
-
-
 
 /*
 var crypto = require('crypto'),
