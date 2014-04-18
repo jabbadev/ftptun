@@ -6,13 +6,13 @@ var Config = require('./lib/clientInit.js'),
 
 clientConf = new Config();
 clientConf.loadConfig(Main);
-//clientConf.on('load',Main);
 
 function Main(conf){
 	var downloader = new Downloader(conf,process.argv[2]);
-	console.log(downloader.toString());
+	downloader.exitOnComplete();
 	
-	process.exit();
+	//var waitCompete = setTimeout(function(){console.log('exit....');},5000);
+	//waitCompete.unref();
 }
 
 /*
