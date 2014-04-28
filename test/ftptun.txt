@@ -1,0 +1,1 @@
+./ftptun.js http://www.funtoo.org/distfiles/chrome/google-chrome-stable_33.0.1750.152-1_i386.de
