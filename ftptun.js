@@ -9,10 +9,7 @@ clientConf.loadConfig(Main);
 
 function Main(conf){
 	var downloader = new Downloader(conf,process.argv[2]);
-	downloader.exitOnComplete();
-	
-	//var waitCompete = setTimeout(function(){console.log('exit....');},5000);
-	//waitCompete.unref();
+
 }
 
 /*
