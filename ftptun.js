@@ -9,7 +9,6 @@ clientConf.loadConfig(Main);
 
 function Main(conf){
 	var downloader = new Downloader(conf,process.argv[2]);
-
 }
 
 /*
