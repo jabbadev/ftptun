@@ -35,8 +35,12 @@ describe('Chunker',function(){
 	});
 	describe('#forEach(callBack)',function(){
 		it('should exec callBack on every chunk',function(){
-			var ck = new Chunker(3011,1000);
-			ck.forEach(function(chunk){console.log(chunk);});
+			var ck = new Chunker(3011,1000),
+				chunks = [[3000,3011],[2000,2999],[1000,1999],[0,999]];
+			ck.forEach(function(chunk){
+				var ac = chunks.pop();
+				ac.should.eql(chunk);
+			});
 		});
 	});
 });
