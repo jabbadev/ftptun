@@ -1,0 +1,8 @@
+{
+  "name": "ptun",
+  "email": "jabba.dev@gmail.com",
+  "url": "https://github.com/jabbadev",
+  "devDependencies": {
+    "should": "^3.3.1"
+  }
+}
