@@ -1,7 +1,10 @@
 
 var assert = require("assert"),
 	should = require('should'),
-	Chunker = require('../lib/chunker');
+	Chunker = require('../lib/chunker'),
+	HttpDownloader = require('../lib/httpdownloader'),
+	fs = require('fs'),
+	http = require('http');
 
 describe('Chunker',function(){
 	describe('#next()',function(){
@@ -41,6 +44,45 @@ describe('Chunker',function(){
 				var ac = chunks.pop();
 				ac.should.eql(chunk);
 			});
+		});
+	});
+});
+
+describe('HttpDownloader',function(){
+
+	before(function(){
+		var fd = fs.openSync('test/resweb.txt','w');
+		for( var c in ['a','b','c','d','e','f','g','h','i','l']) {
+			fs.writeSync(fd,new Array(1024*1024).join(c));
+		}
+		fs.closeSync(fd);
+		 
+		http.createServer(function (req, res) {
+			res.writeHead(200,{'Content-Type': 'text/plain'});
+			var st = fs.createReadStream('test/resweb.txt');
+			st.on('data',function(chunk){res.write(data)});
+			st.on('end',function(){
+				st.close();
+				res.end();
+			});
+			
+		}).listen(8080,'127.0.0.1');
+		console.log('Server running at http://127.0.0.1:8080/'); 
+	});
+	
+	after(function(){
+		fs.unlinkSync('test/resweb.txt');
+	});
+	
+	describe('#start()',function(){
+		it('start http docwnload',function(){
+			console.log('start()');
+			var hd = new HttpDownloader({});
+		});
+	});
+	describe('#suspend()',function(done){
+		it('suspend the download ',function(){
+			console.log('start()');
 		});
 	});
 });
