@@ -4,7 +4,8 @@ var assert = require("assert"),
 	Chunker = require('../lib/chunker'),
 	HttpDownloader = require('../lib/httpdownloader'),
 	fs = require('fs'),
-	http = require('http');
+	http = require('http'),
+	URL = require('url');
 
 describe('Chunker',function(){
 	describe('#next()',function(){
@@ -52,22 +53,29 @@ describe('HttpDownloader',function(){
 
 	before(function(){
 		var fd = fs.openSync('test/resweb.txt','w');
-		for( var c in ['a','b','c','d','e','f','g','h','i','l']) {
-			fs.writeSync(fd,new Array(1024*1024).join(c));
-		}
-		fs.closeSync(fd);
-		 
-		http.createServer(function (req, res) {
-			res.writeHead(200,{'Content-Type': 'text/plain'});
-			var st = fs.createReadStream('test/resweb.txt');
-			st.on('data',function(chunk){res.write(data)});
-			st.on('end',function(){
-				st.close();
-				res.end();
+		var f = fs.createWriteStream('test/resweb.txt');
+		f.on('open',function(){
+			['a','b','c','d','e','f','g','h','i','l'].forEach(function(letter,i){
+				f.write(new Array(1024*1024).join(letter));
+				if ( letter == 'l' ) {
+					f.end();
+				}
 			});
-			
-		}).listen(8080,'127.0.0.1');
-		console.log('Server running at http://127.0.0.1:8080/'); 
+		});
+		f.on('finish',function(){
+			f.close();
+			http.createServer(function (req,res) {
+				res.writeHead(200,{'Content-Type': 'text/plain'});
+				var st = fs.createReadStream('test/resweb.txt');
+				st.on('data',function(data){res.write(data);});
+				st.on('end',function(){
+					st.close();
+					res.end();
+				});
+				console.log('Server running at http://127.0.0.1:8080/'); 
+			}).listen(8080,'127.0.0.1');
+			//done();
+		});
 	});
 	
 	after(function(){
@@ -76,13 +84,8 @@ describe('HttpDownloader',function(){
 	
 	describe('#start()',function(){
 		it('start http docwnload',function(){
-			console.log('start()');
-			var hd = new HttpDownloader({});
-		});
-	});
-	describe('#suspend()',function(done){
-		it('suspend the download ',function(){
-			console.log('start()');
+			var hd = new HttpDownloader({ reqOpt: URL.parse('http://127.0.0.1:8080/') });
+			hd.start();
 		});
 	});
 });
