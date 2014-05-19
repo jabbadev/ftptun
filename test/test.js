@@ -56,7 +56,6 @@ describe('HttpDownloader',function(){
 		f.on('open',function(){
 			['a','b','c','d','e','f','g','h','i','l'].forEach(function(letter,i){
 				f.write(new Array(1024*1024).join(letter),function(){
-					console.log('write: ',letter);
 					if ( letter == 'l' ) {
 						f.end();
 					}
@@ -73,19 +72,29 @@ describe('HttpDownloader',function(){
 				});
 			}).listen(8080,'127.0.0.1',function(){
 				done();
-				console.log('Server running at http://127.0.0.1:8080/'); 
+				//console.log('Server running at http://127.0.0.1:8080/'); 
 			});
 		});
 	});
 	
 	after(function(){
-		//fs.unlinkSync('test/resweb.txt');
+		fs.unlinkSync('test/resweb.txt');
 	});
 	
 	describe('#start()',function(){
-		it('start http docwnload',function(){
-			console.log('start()');
+		it('start http docwnload',function(done){
+			var bytes = 0;
 			var hd = new HttpDownloader({ reqOpt: URL.parse('http://127.0.0.1:8080/') });
+			
+			hd.on('data',function(data){
+				bytes = bytes + data.length;
+			});
+		
+			hd.on('end',function(){
+				bytes.should.eql(10485750);
+				done();
+			});
+			
 			hd.start();
 		});
 	});
