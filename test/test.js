@@ -5,7 +5,8 @@ var assert = require("assert"),
 	HttpDownloader = require('../lib/httpdownloader'),
 	fs = require('fs'),
 	http = require('http'),
-	URL = require('url');
+	URL = require('url'),
+	crypto = require('crypto');
 
 describe('Chunker',function(){
 	describe('#next()',function(){
@@ -52,6 +53,8 @@ describe('Chunker',function(){
 describe('HttpDownloader',function(){
 
 	before(function(done){
+		var cipher = crypto.createCipher('aes-256-cbc',"secret1234");
+		
 		var f = fs.createWriteStream('test/resweb.txt');
 		f.on('open',function(){
 			['a','b','c','d','e','f','g','h','i','l'].forEach(function(letter,i){
@@ -64,12 +67,21 @@ describe('HttpDownloader',function(){
 		});
 		f.on('finish',function(){
 			http.createServer(function (req,res) {
-				res.writeHead(200,{'Content-Type': 'text/plain'});
-				var st = fs.createReadStream('test/resweb.txt');
-				st.on('data',function(data){res.write(data);});
-				st.on('end',function(){
-					res.end();
-				});
+				if ( req.url == "/cipher" ) {
+					var secret = new Buffer("This is a secret message");
+					var secBuff = new Buffer(secret.toString("base64"),"base64");
+					res.write(cipher.update(secBuff));
+					res.end(cipher.final());
+				
+				} else {
+				
+					res.writeHead(200,{'Content-Type': 'text/plain'});
+					var st = fs.createReadStream('test/resweb.txt');
+					st.on('data',function(data){res.write(data);});
+					st.on('end',function(){
+						res.end();
+					});
+				}
 			}).listen(8080,'127.0.0.1',function(){
 				done();
 				//console.log('Server running at http://127.0.0.1:8080/'); 
@@ -97,5 +109,28 @@ describe('HttpDownloader',function(){
 			
 			hd.start();
 		});
+		
+		describe('#cipher download',function(){
+		it('cipher download',function(done){
+			var secMsg = "";
+			var hd = new HttpDownloader({ reqOpt: URL.parse('http://127.0.0.1:8080/cipher'),
+										  decipher: { secretkey: "secret1234","algorithm": "aes-256-cbc" }});
+			
+			hd.on('data',function(data){
+				secMsg = secMsg + data.toString();
+			});
+		
+			hd.on('end',function(data){
+				if(data != null){
+					secMsg = secMsg + data.toString();
+				}
+				console.log(secMsg);
+				secMsg.should.eql("This is a secret message");
+				done();
+			});
+			
+			hd.start();
+		});
+	});
 	});
 });

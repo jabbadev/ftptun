@@ -1,10 +1,11 @@
 {
-   "proxy-host": "wwwproxy.netbank.hbl.local",
-   "proxy-port": "8080",
-   "proxy-auth": "Basic",
-   "proxy-user": "NETBANK\\U803991",
-   "proxy-passwd": "iabba678",
+   "proxy": { "host": "wwwproxy.netbank.hbl.local",
+              "port": "8080",
+              "proxy-auth": "Basic",
+              "proxy-user": "NETBANK\\U803991",
+              "proxy-passwd": "iabba678" },
    "user-agent": "curl/7.35.0",
-   "ptun-server": "http://127.0.0.1:1337/",
-   "secretkey": "secret1234"
+   "ptun": { "server": "http://127.0.0.1:1337/",
+			 "secretkey": "secret1234",
+             "algorithm": "aes-256-cbc" }
 }
