@@ -73,8 +73,9 @@ describe('HttpDownloader',function(){
 					res.write(cipher.update(secBuff));
 					res.end(cipher.final());
 				
+				} else if ( req.url == "/chunk" ) {
+					console.log(req.headers);
 				} else {
-				
 					res.writeHead(200,{'Content-Type': 'text/plain'});
 					var st = fs.createReadStream('test/resweb.txt');
 					st.on('data',function(data){res.write(data);});
@@ -111,26 +112,48 @@ describe('HttpDownloader',function(){
 		});
 		
 		describe('#cipher download',function(){
-		it('cipher download',function(done){
-			var secMsg = "";
-			var hd = new HttpDownloader({ reqOpt: URL.parse('http://127.0.0.1:8080/cipher'),
-										  decipher: { secretkey: "secret1234","algorithm": "aes-256-cbc" }});
+			it('cipher download',function(done){
+				var secMsg = "";
+				var hd = new HttpDownloader({ reqOpt: URL.parse('http://127.0.0.1:8080/cipher'),
+										  ptun: { "server": "http://127.0.0.1:8080/", secretkey: "secret1234","algorithm": "aes-256-cbc" }});
 			
-			hd.on('data',function(data){
-				secMsg = secMsg + data.toString();
-			});
-		
-			hd.on('end',function(data){
-				if(data != null){
+				hd.on('data',function(data){
 					secMsg = secMsg + data.toString();
-				}
-				console.log(secMsg);
-				secMsg.should.eql("This is a secret message");
-				done();
-			});
+				});
+		
+				hd.on('end',function(data){
+					if(data != null){
+						secMsg = secMsg + data.toString();
+					}
+					secMsg.should.eql("This is a secret message");
+					done();
+				});
 			
-			hd.start();
+				hd.start();
+			});
 		});
-	});
+		
+		describe('#chunk download',function(){
+			it('chunk download',function(done){
+				var secMsg = "";
+				var hd = new HttpDownloader({ reqOpt: URL.parse('http://127.0.0.1:8080/chunk'),
+										  chunk: { start: 1048576, end: 2097152 } });
+			
+				hd.on('data',function(data){
+					secMsg = secMsg + data.toString();
+				});
+		
+				hd.on('end',function(data){
+					if(data != null){
+						secMsg = secMsg + data.toString();
+					}
+					secMsg.should.eql("This is a secret message");
+					done();
+				});
+			
+				hd.start();
+			});
+		});
+		
 	});
 });
