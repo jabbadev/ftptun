@@ -74,7 +74,18 @@ describe('HttpDownloader',function(){
 					res.end(cipher.final());
 				
 				} else if ( req.url == "/chunk" ) {
-					console.log(req.headers);
+					
+					var start = (req.headers.range.split("-"))[0];
+					var end = (req.headers.range.split("-"))[1];
+					var offset = end - start ;
+					console.log(start,end,offset);
+					var data = new Buffer(offset);
+					var fd = fs.openSync('test/resweb.txt','r');
+					fs.readSync(fd,data,start,offset-1);
+					fs.closeSync(fd);
+					console.log('data: ',data);
+					res.end(data);
+					
 				} else {
 					res.writeHead(200,{'Content-Type': 'text/plain'});
 					var st = fs.createReadStream('test/resweb.txt');
@@ -137,7 +148,7 @@ describe('HttpDownloader',function(){
 			it('chunk download',function(done){
 				var secMsg = "";
 				var hd = new HttpDownloader({ reqOpt: URL.parse('http://127.0.0.1:8080/chunk'),
-										  chunk: { start: 1048576, end: 2097152 } });
+										  chunk: { start: (1024*1024)-2, end: (1024*1024)+2 } });
 			
 				hd.on('data',function(data){
 					secMsg = secMsg + data.toString();
