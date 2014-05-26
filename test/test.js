@@ -58,7 +58,7 @@ describe('HttpDownloader',function(){
 		var f = fs.createWriteStream('test/resweb.txt');
 		f.on('open',function(){
 			['a','b','c','d','e','f','g','h','i','l'].forEach(function(letter,i){
-				f.write(new Array(1024*1024).join(letter),function(){
+				f.write((new Array(1024).join(letter)) + letter,function(){
 					if ( letter == 'l' ) {
 						f.end();
 					}
@@ -66,6 +66,8 @@ describe('HttpDownloader',function(){
 			});
 		});
 		f.on('finish',function(){
+			f.close();
+			
 			http.createServer(function (req,res) {
 				if ( req.url == "/cipher" ) {
 					var secret = new Buffer("This is a secret message");
@@ -73,31 +75,30 @@ describe('HttpDownloader',function(){
 					res.write(cipher.update(secBuff));
 					res.end(cipher.final());
 				
-				} else if ( req.url == "/chunk" ) {
-					
-					var start = (req.headers.range.split("-"))[0];
-					var end = (req.headers.range.split("-"))[1];
-					var offset = end - start ;
-					console.log(start,end,offset);
-					var data = new Buffer(offset);
-					var fd = fs.openSync('test/resweb.txt','r');
-					fs.readSync(fd,data,start,offset-1);
-					fs.closeSync(fd);
-					console.log('data: ',data);
-					res.end(data);
-					
+				} else if ( req.url == "/chunk" ) {		
+					var start = parseInt((req.headers.range.split("-"))[0]);
+					var end = parseInt((req.headers.range.split("-"))[1]);
+					var chunk = fs.createReadStream('test/resweb.txt',{
+						start: start,
+						end: end
+					});
+					chunk.on('data',function(data){ res.write(data); });
+					chunk.on('end',function(){ res.end(); });
 				} else {
 					res.writeHead(200,{'Content-Type': 'text/plain'});
 					var st = fs.createReadStream('test/resweb.txt');
 					st.on('data',function(data){res.write(data);});
 					st.on('end',function(){
-						res.end();
+						st.close(function(){
+							res.end();
+						});
 					});
 				}
 			}).listen(8080,'127.0.0.1',function(){
 				done();
 				//console.log('Server running at http://127.0.0.1:8080/'); 
 			});
+			
 		});
 	});
 	
@@ -115,7 +116,7 @@ describe('HttpDownloader',function(){
 			});
 		
 			hd.on('end',function(){
-				bytes.should.eql(10485750);
+				bytes.should.eql(10240);
 				done();
 			});
 			
@@ -148,8 +149,8 @@ describe('HttpDownloader',function(){
 			it('chunk download',function(done){
 				var secMsg = "";
 				var hd = new HttpDownloader({ reqOpt: URL.parse('http://127.0.0.1:8080/chunk'),
-										  chunk: { start: (1024*1024)-2, end: (1024*1024)+2 } });
-			
+										      chunk: { start: 1024, end: 2047 } });
+	
 				hd.on('data',function(data){
 					secMsg = secMsg + data.toString();
 				});
@@ -158,11 +159,12 @@ describe('HttpDownloader',function(){
 					if(data != null){
 						secMsg = secMsg + data.toString();
 					}
-					secMsg.should.eql("This is a secret message");
+					secMsg.should.eql(new Array(1024).join('b')+'b');
 					done();
 				});
 			
 				hd.start();
+				
 			});
 		});
 		
