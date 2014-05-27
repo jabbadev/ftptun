@@ -69,12 +69,12 @@ describe('HttpDownloader',function(){
 			f.close();
 			
 			http.createServer(function (req,res) {
+				
 				if ( req.url == "/cipher" ) {
 					var secret = new Buffer("This is a secret message");
 					var secBuff = new Buffer(secret.toString("base64"),"base64");
 					res.write(cipher.update(secBuff));
 					res.end(cipher.final());
-				
 				} else if ( req.url == "/chunk" ) {		
 					var start = parseInt((req.headers.range.split("-"))[0]);
 					var end = parseInt((req.headers.range.split("-"))[1]);
@@ -84,6 +84,27 @@ describe('HttpDownloader',function(){
 					});
 					chunk.on('data',function(data){ res.write(data); });
 					chunk.on('end',function(){ res.end(); });
+				} else if ( req.url == "/ptun" ) {
+					var bodyReq = "";
+					req.on('data',function(data){
+						bodyReq += data;
+					});
+					req.on('end',function(){
+						console.log('call: ',JSON.parse(bodyReq));
+						var msg = "";
+						var webResReq = http.request(JSON.parse(bodyReq),function(webResRes){
+							webResRes.on('data',function(data){
+								console.log('write data');
+								res.write(data); 
+							});
+							webResRes.on('end',function(){
+								console.log('xxxx: ',msg);
+								res.end();
+							});
+						});
+						webResReq.end();
+					});
+					
 				} else {
 					res.writeHead(200,{'Content-Type': 'text/plain'});
 					var st = fs.createReadStream('test/resweb.txt');
@@ -127,7 +148,7 @@ describe('HttpDownloader',function(){
 			it('cipher download',function(done){
 				var secMsg = "";
 				var hd = new HttpDownloader({ reqOpt: URL.parse('http://127.0.0.1:8080/cipher'),
-										  ptun: { "server": "http://127.0.0.1:8080/", secretkey: "secret1234","algorithm": "aes-256-cbc" }});
+										  ptun: { "server": "http://127.0.0.1:8080/cipher", secretkey: "secret1234","algorithm": "aes-256-cbc" }});
 			
 				hd.on('data',function(data){
 					secMsg = secMsg + data.toString();
@@ -160,6 +181,30 @@ describe('HttpDownloader',function(){
 						secMsg = secMsg + data.toString();
 					}
 					secMsg.should.eql(new Array(1024).join('b')+'b');
+					done();
+				});
+			
+				hd.start();
+				
+			});
+		});
+		
+		describe('#ptun download',function(){
+			it('download using ptun',function(done){
+				var secMsg = "";
+				var hd = new HttpDownloader({ reqOpt: URL.parse('http://127.0.0.1:8080/cipher'),
+										      ptun: { "server": "http://127.0.0.1:8080/ptun", secretkey: "secret1234","algorithm": "aes-256-cbc" } });
+	
+				hd.on('data',function(data){
+					secMsg = secMsg + data.toString();
+				});
+		
+				hd.on('end',function(data){
+					if(data != null){
+						secMsg = secMsg + data.toString();
+					}
+					console.log('secMeg: ',secMsg);
+					//secMsg.should.eql(new Array(1024).join('b')+'b');
 					done();
 				});
 			
