@@ -75,6 +75,12 @@ describe('HttpDownloader',function(){
 					var secBuff = new Buffer(secret.toString("base64"),"base64");
 					res.write(cipher.update(secBuff));
 					res.end(cipher.final());
+				} else if ( req.url == "/ptun_cipher") { 
+					var localCipher = crypto.createCipher('aes-256-cbc',"secret1234");
+					secret = new Buffer("ptun download");
+					secBuff = new Buffer(secret.toString("base64"),"base64");
+					res.write(localCipher.update(secBuff));
+					res.end(localCipher.final());
 				} else if ( req.url == "/chunk" ) {		
 					var start = parseInt((req.headers.range.split("-"))[0]);
 					var end = parseInt((req.headers.range.split("-"))[1]);
@@ -90,15 +96,12 @@ describe('HttpDownloader',function(){
 						bodyReq += data;
 					});
 					req.on('end',function(){
-						console.log('call: ',JSON.parse(bodyReq));
 						var msg = "";
 						var webResReq = http.request(JSON.parse(bodyReq),function(webResRes){
 							webResRes.on('data',function(data){
-								console.log('write data');
 								res.write(data); 
 							});
 							webResRes.on('end',function(){
-								console.log('xxxx: ',msg);
 								res.end();
 							});
 						});
@@ -192,7 +195,7 @@ describe('HttpDownloader',function(){
 		describe('#ptun download',function(){
 			it('download using ptun',function(done){
 				var secMsg = "";
-				var hd = new HttpDownloader({ reqOpt: URL.parse('http://127.0.0.1:8080/cipher'),
+				var hd = new HttpDownloader({ reqOpt: URL.parse('http://127.0.0.1:8080/ptun_cipher'),
 										      ptun: { "server": "http://127.0.0.1:8080/ptun", secretkey: "secret1234","algorithm": "aes-256-cbc" } });
 	
 				hd.on('data',function(data){
@@ -203,8 +206,7 @@ describe('HttpDownloader',function(){
 					if(data != null){
 						secMsg = secMsg + data.toString();
 					}
-					console.log('secMeg: ',secMsg);
-					//secMsg.should.eql(new Array(1024).join('b')+'b');
+					secMsg.should.eql("ptun download");
 					done();
 				});
 			
