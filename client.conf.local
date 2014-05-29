@@ -5,7 +5,7 @@
               "proxy-user": "NETBANK\\U803991",
               "proxy-passwd": "iabba678" },
    "user-agent": "curl/7.35.0",
-   "ptun": { "server": "http://127.0.0.1:1337/",
+   "ptun": { "server": "http://ftptun-morra.rhcloud.com/",
 			 "secretkey": "secret1234",
              "algorithm": "aes-256-cbc" }
 }

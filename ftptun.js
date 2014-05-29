@@ -8,7 +8,6 @@ clientConf = new Config();
 clientConf.loadConfig(Main);
 
 function Main(conf){
-	console.log(conf);
 	var downloader = new Downloader(conf,process.argv[2]);
 }
 
