@@ -1,8 +1,8 @@
 #!/bin/env node
 
 var Config = require('./lib/clientInit.js'),
-	Downloader = require('./lib/downloader.js')
-	finish = false,
+	Downloader = require('./lib/downloader.js'),                      
+	finish = false;
 
 clientConf = new Config();
 clientConf.loadConfig(Main);
