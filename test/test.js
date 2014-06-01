@@ -3,6 +3,7 @@ var assert = require("assert"),
 	should = require('should'),
 	Chunker = require('../lib/chunker'),
 	HttpDownloader = require('../lib/httpdownloader'),
+	DownloadManager = require('../lib/downloadManager.js'),
 	fs = require('fs'),
 	http = require('http'),
 	URL = require('url'),
@@ -213,6 +214,14 @@ describe('HttpDownloader',function(){
 				hd.start();
 				
 			});
+		});
+		
+		describe('#DownloadManager test',function(){
+				it('test download manager',function(done){
+					var dm = new DownloadManager({
+							
+					});
+				});
 		});
 		
 	});
