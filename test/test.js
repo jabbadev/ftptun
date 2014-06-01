@@ -128,7 +128,7 @@ describe('HttpDownloader',function(){
 	});
 	
 	after(function(){
-		fs.unlinkSync('test/resweb.txt');
+		//fs.unlinkSync('test/resweb.txt');
 	});
 	
 	describe('#start()',function(){
@@ -219,8 +219,21 @@ describe('HttpDownloader',function(){
 		describe('#DownloadManager test',function(){
 				it('test download manager',function(done){
 					var dm = new DownloadManager({
-							
+							workers: 20,
+							chunkSize: 1024,
+							resSize: 10240 
 					});
+					
+					dm.on('data',function(data){
+						console.log(data);	
+					});
+					
+					dm.on('finish',function(){
+						console.log(data)
+					});
+					
+					dm.start();
+					
 				});
 		});
 		
