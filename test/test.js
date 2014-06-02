@@ -219,9 +219,10 @@ describe('HttpDownloader',function(){
 		describe('#DownloadManager test',function(){
 				it('test download manager',function(done){
 					var dm = new DownloadManager({
-							workers: 20,
+							workers: 3,
 							chunkSize: 1024,
-							resSize: 10240 
+							resSize: 10240,
+							reqOpt: URL.parse('http://127.0.0.1:8080/chunk') 
 					});
 					
 					dm.on('data',function(data){
