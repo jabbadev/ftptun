@@ -218,19 +218,28 @@ describe('HttpDownloader',function(){
 		
 		describe('#DownloadManager test',function(){
 				it('test download manager',function(done){
+					/*
 					var dm = new DownloadManager({
 							workers: 3,
 							chunkSize: 1024,
 							resSize: 10240,
 							reqOpt: URL.parse('http://127.0.0.1:8080/chunk') 
 					});
+					*/
+					var dm = new DownloadManager({
+							workers: 1,
+							chunkSize: 8611840,
+							resSize: 8611840,
+							reqOpt: URL.parse('http://127.0.0.1:8080/chunk') 
+					});
+					
 					
 					dm.on('data',function(data){
-						console.log(data);	
+						console.log(data.toString());	
 					});
 					
 					dm.on('finish',function(){
-						console.log(data)
+						console.log(end);
 					});
 					
 					dm.start();
