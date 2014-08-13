@@ -4,51 +4,72 @@ var TaskExecutor = require('../lib/taskexecutor'),
 
 describe('TaskExecutor',function(){
 	
-	before(function(){
-		this.te = new TaskExecutor([
-	       function(callback){
-			   console.log('eseguo task0 .... ');
-			   setTimeout(function(){
-				   callback(5000,null);
-			   },5000);
-		   },
-		   function(callback){
-			   console.log('eseguo task1 .... ');
-			   setTimeout(function(){
-				   callback(2000,null);
-			   },2000);
-		   },
-		   function(callback){
-			   console.log('eseguo task2 .... ');
-			   setTimeout(function(){
-				   callback(3000,"task 2 in errore");
-			   },3000);
-		   },
-		   function(callback){
-			   console.log('eseguo task3 .... ');
-			   setTimeout(function(){
-				   callback(10000,null);
-			   },10000);
-		   },
-		   function(callback){
-			   console.log('eseguo task4 .... ');
-			   setTimeout(function(){
-				   callback(8000,null);
-			   },8000);
-		   }
-		],3);
-	});
-	
 	describe('#TaskExecutor.staus()',function(){
 		it("should return the TaskExecutor status",function(){
-			({ tasks: 5, running: 0 }).should.eql(this.te.status());
+			var te = new TaskExecutor([function(){},function(){},function(){},function(){},function(){}]);
+			({ tasks: 5, running: 0 }).should.eql(te.status());
 		});
 	});
 	
 	describe('#TaskExecutor.start()',function(){
 		it("should return the TaskExecutor status",function(done){
-			this.te.start();
-			({ tasks: 5, running: 3 }).should.eql(this.te.status());
+			
+			var ok_task = [],
+			ko_task = [],
+			te = new TaskExecutor([
+     	      function(callback){
+     			   setTimeout(function(){callback({ stat: "ok", id: 1 },null);},100);
+     		  },
+     		  function(callback){
+     			   setTimeout(function(){callback(null,{ id: 2, code: 500, message: "resource unavailable" });},5);
+     		  },
+     		  function(callback){
+     			   setTimeout(function(){callback({ id: 3 },null);},3);
+     		  }
+			],2);
+			
+			te.on('taskComplete',function(success,error){
+				if(!error){
+					ok_task.push(success.id);
+				}
+				else {
+					ko_task.push(error);
+				}
+			});
+			te.on('allTasksComplete',function(){
+				[3,1].should.eql(ok_task);
+				({ id: 2, code: 500, message: "resource unavailable" }).should.eql(ko_task[0]);
+				done();
+			});
+			
+			te.start();
+			({ tasks: 3, running: 2 }).should.eql(te.status());
+			
+		});
+	
+		describe('#TaskExecutor.start() on empty task list',function(){
+			it("should return the TaskExecutor status",function(done){
+				var te = new TaskExecutor([],3);
+				te.on('allTasksComplete',function(){done();});
+				te.start();
+			});
+		});
+		
+		describe('#TaskExecutor.start() on 3 task list with pool 1',function(){
+			it("should return the TaskExecutor status",function(done){
+				var ok_tasks = [];
+				var te = new TaskExecutor([function(callback){callback(1,null);},
+				                           function(callback){callback(2,null);},
+				                           function(callback){callback(3,null);},
+				                           function(callback){callback(4,null);}
+				                           ],1);
+				te.on('taskComplete',function(success,error){ok_tasks.push(success); });
+				te.on('allTasksComplete',function(){
+					[1,2,3,4].should.eql(ok_tasks);
+					done();
+				});
+				te.start();
+			});
 		});
 	});
 	
