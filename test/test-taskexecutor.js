@@ -71,6 +71,26 @@ describe('TaskExecutor',function(){
 				te.start();
 			});
 		});
+		
+		describe('#TaskExecutor.start()',function(){
+			it("TaskExecutor supply mode",function(done){
+				var cont = 0;
+				var tasks = [function(callback){callback(1,null);},
+				             function(callback){callback(2,null);},
+				             function(callback){callback(3,null);},
+				             function(callback){callback(4,null);}
+				             ];
+				var te = new TaskExecutor(function(){
+					if( cont == tasks.length - 1){
+						return null;
+					}
+					return tasks[cont];
+				},3);
+				
+				
+				te.start();
+			});
+		});
 	});
 	
 });
