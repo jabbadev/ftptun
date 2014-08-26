@@ -4,10 +4,12 @@ var should = require('should'),
 	fs = require('fs'),
 	http = require('http'),
 	URL = require('url'),
-	crypto = require('crypto'),
-	HTTP_PORT = 8080;
+	crypto = require('crypto');
+	
 
 describe('DownloadManager',function(){
+	var HTTP_PORT = 8080,
+	RESWEB_FILE = 'test/dm-resweb.txt';
 
 	before(function(done){
 		var cipher = crypto.createCipher('aes-256-cbc',"secret1234");
@@ -22,7 +24,7 @@ describe('DownloadManager',function(){
 			});
 		}
 		
-		var f = fs.createWriteStream('test/resweb.txt');
+		var f = fs.createWriteStream(RESWEB_FILE);
 		f.on('open',function(){
 			['a','b','c','d','e','f','g','h','i','l'].forEach(function(letter,i){
 				f.write((new Array(1024).join(letter)) + letter,function(){
@@ -51,7 +53,7 @@ describe('DownloadManager',function(){
 					} else if ( req.url == "/chunk" ) {		
 						var start = parseInt((req.headers.range.split("-"))[0]);
 						var end = parseInt((req.headers.range.split("-"))[1]);
-						var chunk = fs.createReadStream('test/resweb.txt',{
+						var chunk = fs.createReadStream(RESWEB_FILE,{
 							start: start,
 							end: end
 						});
@@ -77,7 +79,7 @@ describe('DownloadManager',function(){
 						
 					} else {
 						res.writeHead(200,{'Content-Type': 'text/plain'});
-						var st = fs.createReadStream('test/resweb.txt');
+						var st = fs.createReadStream(RESWEB_FILE);
 						st.on('data',function(data){res.write(data);});
 						st.on('end',function(){
 							st.close(function(){
@@ -86,7 +88,6 @@ describe('DownloadManager',function(){
 						});
 					}
 				}).listen(port,'127.0.0.1',function(){
-					console.log('listen on: ',HTTP_PORT);
 					done();
 				});
 			});
@@ -95,7 +96,7 @@ describe('DownloadManager',function(){
 	});
 	
 	after(function(){
-		//fs.unlinkSync('test/resweb.txt');
+		fs.unlinkSync(RESWEB_FILE);
 	});
 	
 	describe('#DownloadManager test',function(){
