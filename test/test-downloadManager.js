@@ -4,12 +4,23 @@ var should = require('should'),
 	fs = require('fs'),
 	http = require('http'),
 	URL = require('url'),
-	crypto = require('crypto');
+	crypto = require('crypto'),
+	HTTP_PORT = 8080;
 
 describe('DownloadManager',function(){
 
 	before(function(done){
 		var cipher = crypto.createCipher('aes-256-cbc',"secret1234");
+		
+		/* Check free port */
+		function findFreePort(callback){
+			http.get("http://127.0.0.1:" + HTTP_PORT, function(res) {
+				HTTP_PORT += 1;
+				findFreePort(callback);
+			}).on('error', function(e) {
+				callback(HTTP_PORT);
+			});
+		}
 		
 		var f = fs.createWriteStream('test/resweb.txt');
 		f.on('open',function(){
@@ -24,59 +35,60 @@ describe('DownloadManager',function(){
 		f.on('finish',function(){
 			f.close();
 			
-			http.createServer(function (req,res) {
-				
-				if ( req.url == "/cipher" ) {
-					var secret = new Buffer("This is a secret message");
-					var secBuff = new Buffer(secret.toString("base64"),"base64");
-					res.write(cipher.update(secBuff));
-					res.end(cipher.final());
-				} else if ( req.url == "/ptun_cipher") { 
-					var localCipher = crypto.createCipher('aes-256-cbc',"secret1234");
-					secret = new Buffer("ptun download");
-					secBuff = new Buffer(secret.toString("base64"),"base64");
-					res.write(localCipher.update(secBuff));
-					res.end(localCipher.final());
-				} else if ( req.url == "/chunk" ) {		
-					var start = parseInt((req.headers.range.split("-"))[0]);
-					var end = parseInt((req.headers.range.split("-"))[1]);
-					var chunk = fs.createReadStream('test/resweb.txt',{
-						start: start,
-						end: end
-					});
-					chunk.on('data',function(data){ res.write(data); });
-					chunk.on('end',function(){ res.end(); });
-				} else if ( req.url == "/ptun" ) {
-					var bodyReq = "";
-					req.on('data',function(data){
-						bodyReq += data;
-					});
-					req.on('end',function(){
-						var msg = "";
-						var webResReq = http.request(JSON.parse(bodyReq),function(webResRes){
-							webResRes.on('data',function(data){
-								res.write(data); 
+			findFreePort(function(port){
+				http.createServer(function (req,res) {
+					if ( req.url == "/cipher" ) {
+						var secret = new Buffer("This is a secret message");
+						var secBuff = new Buffer(secret.toString("base64"),"base64");
+						res.write(cipher.update(secBuff));
+						res.end(cipher.final());
+					} else if ( req.url == "/ptun_cipher") { 
+						var localCipher = crypto.createCipher('aes-256-cbc',"secret1234");
+						secret = new Buffer("ptun download");
+						secBuff = new Buffer(secret.toString("base64"),"base64");
+						res.write(localCipher.update(secBuff));
+						res.end(localCipher.final());
+					} else if ( req.url == "/chunk" ) {		
+						var start = parseInt((req.headers.range.split("-"))[0]);
+						var end = parseInt((req.headers.range.split("-"))[1]);
+						var chunk = fs.createReadStream('test/resweb.txt',{
+							start: start,
+							end: end
+						});
+						chunk.on('data',function(data){ res.write(data); });
+						chunk.on('end',function(){ res.end(); });
+					} else if ( req.url == "/ptun" ) {
+						var bodyReq = "";
+						req.on('data',function(data){
+							bodyReq += data;
+						});
+						req.on('end',function(){
+							var msg = "";
+							var webResReq = http.request(JSON.parse(bodyReq),function(webResRes){
+								webResRes.on('data',function(data){
+									res.write(data); 
+								});
+								webResRes.on('end',function(){
+									res.end();
+								});
 							});
-							webResRes.on('end',function(){
+							webResReq.end();
+						});
+						
+					} else {
+						res.writeHead(200,{'Content-Type': 'text/plain'});
+						var st = fs.createReadStream('test/resweb.txt');
+						st.on('data',function(data){res.write(data);});
+						st.on('end',function(){
+							st.close(function(){
 								res.end();
 							});
 						});
-						webResReq.end();
-					});
-					
-				} else {
-					res.writeHead(200,{'Content-Type': 'text/plain'});
-					var st = fs.createReadStream('test/resweb.txt');
-					st.on('data',function(data){res.write(data);});
-					st.on('end',function(){
-						st.close(function(){
-							res.end();
-						});
-					});
-				}
-			}).listen(8080,'127.0.0.1',function(){
-				done();
-				//console.log('Server running at http://127.0.0.1:8080/'); 
+					}
+				}).listen(port,'127.0.0.1',function(){
+					console.log('listen on: ',HTTP_PORT);
+					done();
+				});
 			});
 			
 		});
@@ -100,7 +112,7 @@ describe('DownloadManager',function(){
 					workers: 1,
 					chunkSize: 8611840,
 					resSize: 8611840,
-					reqOpt: URL.parse('http://127.0.0.1:8080/chunk') 
+					reqOpt: URL.parse('http://127.0.0.1:' + HTTP_PORT + '/chunk') 
 			});
 			
 			

@@ -12,7 +12,6 @@ describe('HttpDownloader',function(){
 		var cipher = crypto.createCipher('aes-256-cbc',"secret1234");
 		
 		/* Check free port */
-		
 		function findFreePort(callback){
 			http.get("http://127.0.0.1:" + HTTP_PORT, function(res) {
 				HTTP_PORT += 1;
@@ -101,7 +100,7 @@ describe('HttpDownloader',function(){
 	describe('#start()',function(){
 		it('start http docwnload',function(done){
 			var bytes = 0;
-			var hd = new HttpDownloader({ reqOpt: URL.parse('http://127.0.0.1:8080/') });
+			var hd = new HttpDownloader({ reqOpt: URL.parse('http://127.0.0.1:'+ HTTP_PORT + '/') });
 			
 			hd.on('data',function(data){
 				bytes = bytes + data.length;
@@ -118,8 +117,8 @@ describe('HttpDownloader',function(){
 		describe('#cipher download',function(){
 			it('cipher download',function(done){
 				var secMsg = "";
-				var hd = new HttpDownloader({ reqOpt: URL.parse('http://127.0.0.1:8080/cipher'),
-										  ptun: { "server": "http://127.0.0.1:8080/cipher", secretkey: "secret1234","algorithm": "aes-256-cbc" }});
+				var hd = new HttpDownloader({ reqOpt: URL.parse('http://127.0.0.1:' + HTTP_PORT + '/cipher'),
+										  ptun: { "server": "http://127.0.0.1:" + HTTP_PORT + "/cipher", secretkey: "secret1234","algorithm": "aes-256-cbc" }});
 			
 				hd.on('data',function(data){
 					secMsg = secMsg + data.toString();
@@ -140,7 +139,7 @@ describe('HttpDownloader',function(){
 		describe('#chunk download',function(){
 			it('chunk download',function(done){
 				var secMsg = "";
-				var hd = new HttpDownloader({ reqOpt: URL.parse('http://127.0.0.1:8080/chunk'),
+				var hd = new HttpDownloader({ reqOpt: URL.parse('http://127.0.0.1:' + HTTP_PORT + '/chunk'),
 										      chunk: { start: 1024, end: 2047 } });
 	
 				hd.on('data',function(data){
@@ -163,8 +162,8 @@ describe('HttpDownloader',function(){
 		describe('#ptun download',function(){
 			it('download using ptun',function(done){
 				var secMsg = "";
-				var hd = new HttpDownloader({ reqOpt: URL.parse('http://127.0.0.1:8080/ptun_cipher'),
-										      ptun: { "server": "http://127.0.0.1:8080/ptun", secretkey: "secret1234","algorithm": "aes-256-cbc" } });
+				var hd = new HttpDownloader({ reqOpt: URL.parse('http://127.0.0.1:' + HTTP_PORT + '/ptun_cipher'),
+										      ptun: { "server": "http://127.0.0.1:" + HTTP_PORT + "/ptun", secretkey: "secret1234","algorithm": "aes-256-cbc" } });
 	
 				hd.on('data',function(data){
 					secMsg = secMsg + data.toString();
