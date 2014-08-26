@@ -3,12 +3,24 @@ var should = require('should'),
 	fs = require('fs'),
 	http = require('http'),
 	URL = require('url'),
-	crypto = require('crypto');
+	crypto = require('crypto'),
+	HTTP_PORT = 8080;
 
 describe('HttpDownloader',function(){
 
 	before(function(done){
 		var cipher = crypto.createCipher('aes-256-cbc',"secret1234");
+		
+		/* Check free port */
+		
+		function findFreePort(callback){
+			http.get("http://127.0.0.1:" + HTTP_PORT, function(res) {
+				HTTP_PORT += 1;
+				findFreePort(callback);
+			}).on('error', function(e) {
+				callback(HTTP_PORT);
+			});
+		}
 		
 		var f = fs.createWriteStream('test/resweb.txt');
 		f.on('open',function(){
@@ -23,11 +35,8 @@ describe('HttpDownloader',function(){
 		f.on('finish',function(){
 			f.close();
 			
-			function getServer(){
-				console.log('FIREEEEEEE');
-				
-				var server = http.createServer(function (req,res) {
-					
+			findFreePort(function(port){
+				http.createServer(function (req,res) {
 					if ( req.url == "/cipher" ) {
 						var secret = new Buffer("This is a secret message");
 						var secBuff = new Buffer(secret.toString("base64"),"base64");
@@ -76,26 +85,11 @@ describe('HttpDownloader',function(){
 							});
 						});
 					}
-				});
-				
-				server.on('errore',function(e){
-					console.log('errore bbbb ',e);
-				}); 
-				
-				return server;
-			};
-				
-			try {
-				process.on('uncaughtException',function(e){console.log('ERROREEEEEEEEEEEEE ',e);});
-				 
-				getServer().listen(8080,'127.0.0.1',function(){
-					console.log('runnting');
+				}).listen(port,'127.0.0.1',function(){
+					console.log('listen on: ',HTTP_PORT);
 					done();
-					//console.log('Server running at http://127.0.0.1:8080/'); 
 				});
-			}catch(e){
-				console.log('ERRORE ',e);
-			}
+			});
 			
 		});
 	});
