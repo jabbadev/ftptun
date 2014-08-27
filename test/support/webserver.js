@@ -89,7 +89,7 @@ var createServer =  function(file,done){
 					});
 				});
 			}
-		}).listen(this.port,"127.0.0.1",this.done);
+		}).listen(this.port,"127.0.0.1",function(){self.done(self);});
 	};
 	
 	this.destroy = function(){

@@ -7,7 +7,7 @@ describe('support',function(){
 		support.createServer(
 				'test/a.txt',
 				function(server){
-					console.log('server started .....');
+					console.log('server started .....',server);
 					done();
 				}
 		);
