@@ -5,6 +5,7 @@ var should = require('should'),
 	http = require('http'),
 	URL = require('url'),
 	crypto = require('crypto');
+    require('./test_helper/webserver');
 	
 
 describe('DownloadManager',function(){
