@@ -5,10 +5,11 @@ var fs = require('fs'),
 	crypto = require('crypto');
 
 var createServer =  function(file,done){
-	this.port = 3128;
+	this.port = 8080;
 	this.file = file;
 	this.done = done;
-	var self = this;
+	var self = this,
+		cipher = crypto.createCipher('aes-256-cbc',"secret1234");
 	
 	var f = fs.createWriteStream(this.file);
 	f.on('open',function(){
@@ -39,7 +40,6 @@ var createServer =  function(file,done){
 	this._createServer = function(port){
 		var self = this;
 		this.port = port;
-		console.log('free port: ',port);
 		this.server = http.createServer(function (req,res){
 			if ( req.url == "/cipher" ) {
 				var secret = new Buffer("This is a secret message");
@@ -92,8 +92,10 @@ var createServer =  function(file,done){
 		}).listen(this.port,"127.0.0.1",function(){self.done(self);});
 	};
 	
-	this.destroy = function(){
-		
+	this.close = function(){
+		var self = this;
+		this.server.close();
+		fs.unlinkSync(self.file);
 	};
 };
 
