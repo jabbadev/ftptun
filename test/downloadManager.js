@@ -35,11 +35,13 @@ describe('DownloadManager',function(){
 			});
 			
 			dm.on('data',function(chunk){
-				console.log(chunk.data.toString());	
+				if(chunk.cn == 2){
+					chunk.data.toString().should.eql(new Array(1024).join('c'));
+				}
 			});
 			
 			dm.on('finish',function(){
-				console.log('all chunks complete ...');
+				done();
 			});
 			
 			dm.start();
