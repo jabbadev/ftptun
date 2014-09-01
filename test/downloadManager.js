@@ -34,14 +34,13 @@ describe('DownloadManager',function(){
 					reqOpt: URL.parse('http://127.0.0.1:' + this.supWebServer.port + '/chunk') 
 			});
 			
-			/*
-			dm.on('data',function(data){
-				console.log(data.toString());	
+			dm.on('data',function(chunk){
+				console.log(chunk.data.toString());	
 			});
 			
 			dm.on('finish',function(){
-				console.log(end);
-			});*/
+				console.log('all chunks complete ...');
+			});
 			
 			dm.start();
 			
