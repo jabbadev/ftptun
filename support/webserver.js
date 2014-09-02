@@ -59,8 +59,32 @@ var createServer =  function(file,done){
 					start: start,
 					end: end
 				});
-				chunk.on('data',function(data){ /*console.log('limit: ',start,end,'data: ',data.toString());*/res.write(data); });
+				chunk.on('data',function(data){ res.write(data); });
 				chunk.on('end',function(){ res.end(); });
+			} else if ( req.url == "/chunk-deferred") {
+				
+				var start = parseInt((req.headers.range.split("-"))[0]),
+					end = parseInt((req.headers.range.split("-"))[1]),
+				 	chunk = fs.createReadStream(self.file,{
+						start: start,
+						end: end
+				 	}),
+				 	dataToSend = null;
+				 	
+				chunk.on('data',function(data){
+					dataToSend = data;
+				});
+				chunk.on('end',function(){ 
+					if ( start == 0 && end == 1023 ) {
+						setTimeout(function(){
+							console.log('deferred data');
+							res.end(dataToSend);
+						},300);
+					}
+					else {
+						res.end(dataToSend);
+					}
+				});
 			} else if ( req.url == "/ptun" ) {
 				var bodyReq = "";
 				req.on('data',function(data){

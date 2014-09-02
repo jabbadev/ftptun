@@ -37,9 +37,11 @@ describe('DownloadManager',function(){
 			dm.on('data',function(chunk){
 				if(chunk.cn == 0 ){
 					chunk.data.toString().should.eql((new Array(1025)).join('a'));
+					dm.status().totByte.should.eql(1024);
 				}
 				if(chunk.cn == 2){
 					chunk.data.toString().should.eql((new Array(1025)).join('c'));
+					dm.status().totByte.should.eql(3072);
 				}
 			});
 			
@@ -58,6 +60,7 @@ describe('DownloadManager',function(){
 			
 			dm.on('data',function(pseudoChunk){
 				(pseudoChunk.data.length).should.eql(10240);
+				dm.status().totByte.should.eql(10240);
 			});
 			
 			dm.on('finish',function(){
@@ -65,6 +68,33 @@ describe('DownloadManager',function(){
 			});
 			
 			dm.start();
+		});
+		
+		it('download deferred chunk',function(done){
+			
+			var dm = new DownloadManager({
+					workers: 3,
+					chunkSize: 1024,
+					resSize: 10240,
+					reqOpt: URL.parse('http://127.0.0.1:' + this.supWebServer.port + '/chunk-deferred') 
+			});
+			
+			dm.on('data',function(chunk){
+				console.log(dm.status());
+				if(chunk.cn == 0 ){
+					chunk.data.toString().should.eql((new Array(1025)).join('a'));
+				}
+				if(chunk.cn == 1 ){
+					chunk.data.toString().should.eql((new Array(1025)).join('b'));
+				}
+			});
+			
+			dm.on('finish',function(){
+				done();
+			});
+			
+			dm.start();
+			
 		});
 	});
 
