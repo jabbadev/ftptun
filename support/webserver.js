@@ -77,7 +77,6 @@ var createServer =  function(file,done){
 				chunk.on('end',function(){ 
 					if ( start == 0 && end == 1023 ) {
 						setTimeout(function(){
-							console.log('deferred data');
 							res.end(dataToSend);
 						},300);
 					}

@@ -79,13 +79,20 @@ describe('DownloadManager',function(){
 					reqOpt: URL.parse('http://127.0.0.1:' + this.supWebServer.port + '/chunk-deferred') 
 			});
 			
-			dm.on('data',function(chunk){
-				console.log(dm.status());
+			dm.on('chunk',function(chunk){
 				if(chunk.cn == 0 ){
 					chunk.data.toString().should.eql((new Array(1025)).join('a'));
+					dm.status().totByte.should.eql(10240);
 				}
 				if(chunk.cn == 1 ){
 					chunk.data.toString().should.eql((new Array(1025)).join('b'));
+					dm.status().totByte.should.eql(1024);
+				}
+			});
+			
+			dm.on('data',function(chunk){
+				if(chunk.cn == 0 ){
+					dm.status().totByte.should.eql(10240);
 				}
 			});
 			
