@@ -50,6 +50,22 @@ describe('DownloadManager',function(){
 			dm.start();
 			
 		});
+		
+		it('download chunk feature disabled',function(done){
+			var dm = new DownloadManager({
+				reqOpt: URL.parse('http://127.0.0.1:' + this.supWebServer.port)
+			});
+			
+			dm.on('data',function(pseudoChunk){
+				(pseudoChunk.data.length).should.eql(10240);
+			});
+			
+			dm.on('finish',function(){
+				done();
+			});
+			
+			dm.start();
+		});
 	});
 
 });

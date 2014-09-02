@@ -67,7 +67,6 @@ var createServer =  function(file,done){
 					bodyReq += data;
 				});
 				req.on('end',function(){
-					var msg = "";
 					var webResReq = http.request(JSON.parse(bodyReq),function(webResRes){
 						webResRes.on('data',function(data){
 							res.write(data); 
@@ -93,9 +92,8 @@ var createServer =  function(file,done){
 	};
 	
 	this.close = function(){
-		var self = this;
 		this.server.close();
-		//fs.unlinkSync(self.file);
+		fs.unlinkSync(self.file);
 	};
 };
 
