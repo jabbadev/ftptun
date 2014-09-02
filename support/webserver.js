@@ -78,7 +78,7 @@ var createServer =  function(file,done){
 					if ( start == 0 && end == 1023 ) {
 						setTimeout(function(){
 							res.end(dataToSend);
-						},300);
+						},100);
 					}
 					else {
 						res.end(dataToSend);
