@@ -35,8 +35,11 @@ describe('DownloadManager',function(){
 			});
 			
 			dm.on('data',function(chunk){
+				if(chunk.cn == 0 ){
+					chunk.data.toString().should.eql((new Array(1025)).join('a'));
+				}
 				if(chunk.cn == 2){
-					chunk.data.toString().should.eql(new Array(1024).join('c'));
+					chunk.data.toString().should.eql((new Array(1025)).join('c'));
 				}
 			});
 			

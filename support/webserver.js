@@ -59,7 +59,7 @@ var createServer =  function(file,done){
 					start: start,
 					end: end
 				});
-				chunk.on('data',function(data){ res.write(data); });
+				chunk.on('data',function(data){ /*console.log('limit: ',start,end,'data: ',data.toString());*/res.write(data); });
 				chunk.on('end',function(){ res.end(); });
 			} else if ( req.url == "/ptun" ) {
 				var bodyReq = "";
@@ -95,7 +95,7 @@ var createServer =  function(file,done){
 	this.close = function(){
 		var self = this;
 		this.server.close();
-		fs.unlinkSync(self.file);
+		//fs.unlinkSync(self.file);
 	};
 };
 
