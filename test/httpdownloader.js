@@ -3,7 +3,6 @@ var should = require('should'),
 	HttpDownloader = require('../lib/httpdownloader'),
 	fs = require('fs'),
 	http = require('http'),
-	URL = require('url'),
 	crypto = require('crypto');
 	
 describe('HttpDownloader',function(){
@@ -106,6 +105,21 @@ describe('HttpDownloader',function(){
 				});
 			
 				hd.start();
+				
+			});
+		});
+		
+		describe('get resource size',function(done){
+			it("get resource size",function(){
+				var hd = new HttpDownloader({
+					url: 'http://127.0.0.1:' + this.supWebServer.port + '/size'
+				});
+				
+				hd.size(function(size,error){
+					size.should.eql(10240);
+					done();
+				});
+				
 				
 			});
 		});

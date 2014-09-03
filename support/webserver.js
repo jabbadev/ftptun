@@ -101,7 +101,12 @@ var createServer =  function(file,done){
 					webResReq.end();
 				});
 				
-			} else {
+			//} else if (req.url == "/size" && req.method == 'HEAD' ){
+			} else if (req.url == "/size" ){
+				console.log(req.method);
+				res.headers['content-length'] = 10240;
+				res.send(200);
+			}else {
 				res.writeHead(200,{'Content-Type': 'text/plain'});
 				var st = fs.createReadStream(self.file);
 				st.on('data',function(data){res.write(data);});
