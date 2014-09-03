@@ -31,7 +31,7 @@ describe('DownloadManager',function(){
 					workers: 3,
 					chunkSize: 1024,
 					resSize: 10240,
-					reqOpt: URL.parse('http://127.0.0.1:' + this.supWebServer.port + '/chunk') 
+					url: 'http://127.0.0.1:' + this.supWebServer.port + '/chunk' 
 			});
 			
 			dm.on('data',function(chunk){
@@ -55,7 +55,7 @@ describe('DownloadManager',function(){
 		
 		it('download chunk feature disabled',function(done){
 			var dm = new DownloadManager({
-				reqOpt: URL.parse('http://127.0.0.1:' + this.supWebServer.port)
+				url: 'http://127.0.0.1:' + this.supWebServer.port
 			});
 			
 			dm.on('data',function(pseudoChunk){
@@ -76,7 +76,7 @@ describe('DownloadManager',function(){
 					workers: 3,
 					chunkSize: 1024,
 					resSize: 10240,
-					reqOpt: URL.parse('http://127.0.0.1:' + this.supWebServer.port + '/chunk-deferred') 
+					url: 'http://127.0.0.1:' + this.supWebServer.port + '/chunk-deferred' 
 			});
 			
 			dm.on('chunk',function(chunk){
