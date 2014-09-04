@@ -3,7 +3,6 @@ var should = require('should'),
 	DownloadManager = require('../lib/downloadManager.js'),
 	support = require('../support/webserver'),
 	fs = require('fs'),
-	http = require('http'),
 	crypto = require('crypto');
 
 describe('DownloadManager',function(){
