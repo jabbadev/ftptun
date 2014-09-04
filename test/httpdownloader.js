@@ -110,7 +110,7 @@ describe('HttpDownloader',function(){
 		});
 		
 		describe('get resource size',function(done){
-			it("get resource size",function(){
+			it("get resource size",function(done){
 				var hd = new HttpDownloader({
 					url: 'http://127.0.0.1:' + this.supWebServer.port + '/size'
 				});
