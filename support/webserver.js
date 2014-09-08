@@ -105,7 +105,7 @@ var createServer =  function(file,done){
 				res.writeHead(200,{'content-length': 10240});
 				res.end();
 			}else {
-				res.writeHead(200,{'Content-Type': 'text/plain'});
+				res.writeHead(200,{'Content-Type': 'text/plain','Content-length': 10240 });
 				var st = fs.createReadStream(self.file);
 				st.on('data',function(data){res.write(data);});
 				st.on('end',function(){

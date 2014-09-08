@@ -27,14 +27,16 @@ describe('HttpDownloader',function(){
 	describe('#start()',function(){
 		it('start http docwnload',function(done){
 			var bytes = 0;
-			var hd = new HttpDownloader({ url: 'http://127.0.0.1:'+ this.supWebServer.port + '/' });
+			var hd = new HttpDownloader({ url: 'http://127.0.0.1:'+ this.supWebServer.port + '/',
+										  disableProxy : true });
 			
 			hd.on('data',function(data){
 				bytes = bytes + data.length;
 			});
 		
-			hd.on('end',function(){
+			hd.on('end',function(data,resInfo){
 				bytes.should.eql(10240);
+				resInfo.size.should.eql(10240);
 				done();
 			});
 			
@@ -45,13 +47,14 @@ describe('HttpDownloader',function(){
 			it('cipher download',function(done){
 				var secMsg = "";
 				var hd = new HttpDownloader({ url: 'http://127.0.0.1:' + this.supWebServer.port + '/cipher',
+										  disableProxy : true,
 										  ptun: { "server": "http://127.0.0.1:" + this.supWebServer.port + "/cipher", secretkey: "secret1234","algorithm": "aes-256-cbc" }});
 			
 				hd.on('data',function(data){
 					secMsg = secMsg + data.toString();
 				});
 		
-				hd.on('end',function(data){
+				hd.on('end',function(data,resInfo){
 					if(data != null){
 						secMsg = secMsg + data.toString();
 					}
@@ -67,13 +70,14 @@ describe('HttpDownloader',function(){
 			it('chunk download',function(done){
 				var secMsg = "";
 				var hd = new HttpDownloader({ url: 'http://127.0.0.1:' + this.supWebServer.port + '/chunk',
+											  disableProxy : true,
 										      chunk: { start: 1024, end: 2047 } });
 	
 				hd.on('data',function(data){
 					secMsg = secMsg + data.toString();
 				});
 		
-				hd.on('end',function(data){
+				hd.on('end',function(data,resInfo){
 					if(data != null){
 						secMsg = secMsg + data.toString();
 					}
@@ -90,13 +94,14 @@ describe('HttpDownloader',function(){
 			it('download using ptun',function(done){
 				var secMsg = "";
 				var hd = new HttpDownloader({ url: 'http://127.0.0.1:' + this.supWebServer.port + '/ptun_cipher',
+					  						  disableProxy : true,
 										      ptun: { "server": "http://127.0.0.1:" + this.supWebServer.port + "/ptun", secretkey: "secret1234","algorithm": "aes-256-cbc" } });
 	
 				hd.on('data',function(data){
 					secMsg = secMsg + data.toString();
 				});
 		
-				hd.on('end',function(data){
+				hd.on('end',function(data,resInfo){
 					if(data != null){
 						secMsg = secMsg + data.toString();
 					}
@@ -112,14 +117,14 @@ describe('HttpDownloader',function(){
 		describe('get resource size',function(done){
 			it("get resource size",function(done){
 				var hd = new HttpDownloader({
-					url: 'http://127.0.0.1:' + this.supWebServer.port + '/size'
+					url: 'http://127.0.0.1:' + this.supWebServer.port + '/size',
+					disableProxy : true
 				});
 				
-				hd.size(function(size,error){
-					size.should.eql(10240);
+				hd.size(function(resInfo,error){
+					resInfo.size.should.eql(10240);
 					done();
 				});
-				
 				
 			});
 		});
