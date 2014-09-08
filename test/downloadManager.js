@@ -46,12 +46,12 @@ describe('DownloadManager',function(){
 			var dm = new DownloadManager({
 				workers: 3,
 				chunkSize: 1024,
-				url: 'http://127.0.0.1:' + this.supWebServer.port ,
+				url: 'http://127.0.0.1:' + this.supWebServer.port + "/chunk" ,
 				disableProxy : true
 			});
 		
 			dm.on('data',function(webRes){
-				console.log(webRes);
+				console.log(webRes.data.toString());
 				//webRes.data.length.should.eql(10240);
 			});
 			dm.on('finish',function(){
