@@ -34,8 +34,9 @@ describe('HttpDownloader',function(){
 				bytes = bytes + data.length;
 			});
 		
-			hd.on('end',function(){
+			hd.on('end',function(data,resInfo){
 				bytes.should.eql(10240);
+				resInfo.size.should.eql(10240);
 				done();
 			});
 			
@@ -53,7 +54,7 @@ describe('HttpDownloader',function(){
 					secMsg = secMsg + data.toString();
 				});
 		
-				hd.on('end',function(data){
+				hd.on('end',function(data,resInfo){
 					if(data != null){
 						secMsg = secMsg + data.toString();
 					}
@@ -76,7 +77,7 @@ describe('HttpDownloader',function(){
 					secMsg = secMsg + data.toString();
 				});
 		
-				hd.on('end',function(data){
+				hd.on('end',function(data,resInfo){
 					if(data != null){
 						secMsg = secMsg + data.toString();
 					}
@@ -100,7 +101,7 @@ describe('HttpDownloader',function(){
 					secMsg = secMsg + data.toString();
 				});
 		
-				hd.on('end',function(data){
+				hd.on('end',function(data,resInfo){
 					if(data != null){
 						secMsg = secMsg + data.toString();
 					}
@@ -120,8 +121,8 @@ describe('HttpDownloader',function(){
 					disableProxy : true
 				});
 				
-				hd.size(function(size,error){
-					size.should.eql(10240);
+				hd.size(function(resInfo,error){
+					resInfo.size.should.eql(10240);
 					done();
 				});
 				
