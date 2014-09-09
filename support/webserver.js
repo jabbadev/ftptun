@@ -113,8 +113,11 @@ var createServer =  function(file,done){
 				res.end();
 			} else if (req.url == "/undefined-size" && req.method == 'GET' ){
 				res.writeHead(200,{'Content-Type': 'text/plain'});
-				res.write('undefined size resource');
-				res.end();
+				res.write('chunk 0');
+				setTimeout(function(){
+					res.write('chunk 1');
+					res.end();
+				},300);
 			} else if (req.url == "/undefined-size" && req.method == 'HEAD' ){
 				res.writeHead(200);
 				res.end();

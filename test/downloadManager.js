@@ -101,6 +101,7 @@ describe('DownloadManager',function(){
 		});
 		
 		it('auto direct download',function(done){
+			var cont = 0;
 			var dm = new DownloadManager({
 				workers: 3,
 				chunkSize: 1024,
@@ -111,7 +112,9 @@ describe('DownloadManager',function(){
 			dm.on('data',function(chunk){
 				status = dm.status();
 				(typeof status.resSize == "undefined").should.be.ok;
-				chunk.data.toString().should.eql('undefined size resource');
+				if ( cont == 0 )	chunk.data.toString().should.eql('chunk 0');
+				if ( cont == 1 )	chunk.data.toString().should.eql('chunk 1');
+				cont++;
 			});
 			
 			dm.on('finish',function(){
