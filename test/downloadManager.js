@@ -82,18 +82,19 @@ describe('DownloadManager',function(){
 			
 			dm.start();
 		});
-		
-		it('download deferred chunk',function(done){
+		*/
+		it('download chunk deferred',function(done){
 			
 			var dm = new DownloadManager({
 					workers: 3,
 					chunkSize: 1024,
-					resSize: 10240,
 					url: 'http://127.0.0.1:' + this.supWebServer.port + '/chunk-deferred',
 					disableProxy : true
 			});
 			
 			dm.on('chunk',function(chunk){
+				/* the client get first chunk 1 then chunk 0
+				   the chunk 0 is the last */
 				if(chunk.cn == 0 ){
 					chunk.data.toString().should.eql((new Array(1025)).join('a'));
 					dm.status().totByte.should.eql(10240);
@@ -117,6 +118,5 @@ describe('DownloadManager',function(){
 			dm.start();
 			
 		});
-		*/
 	});
 });
