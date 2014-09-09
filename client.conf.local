@@ -1,11 +1,6 @@
 {
-   "proxy": { "host": "wwwproxy.netbank.hbl.local",
-              "port": "8080",
-              "proxy-auth": "Basic",
-              "proxy-user": "NETBANK\\U803991",
-              "proxy-passwd": "iabba678" },
-   "user-agent": "curl/7.35.0",
-   "ptun": { "server": "http://ftptun-morra.rhcloud.com/",
-			 "secretkey": "secret1234",
-             "algorithm": "aes-256-cbc" }
+	"user-agent": "curl/7.35.0",
+	"ptun": { "server": "http://ftptun-morra.rhcloud.com/",
+			  "secretkey": "secret1234",
+              "algorithm": "aes-256-cbc" }
 }
