@@ -51,15 +51,17 @@ describe('DownloadManager',function(){
 			});
 		
 			dm.on('data',function(webRes){
-				console.log(webRes.data.toString());
-				//webRes.data.length.should.eql(10240);
+				if(webRes.cn == 0 ){
+					webRes.data.toString().should.eql((new Array(1025)).join('a'));
+				}
+				if(webRes.cn == 1 ){
+					webRes.data.toString().should.eql((new Array(1025)).join('b'));
+				}
 			});
 			dm.on('finish',function(){
 				done();
 			});
-		
 			dm.start();
-			
 		});
 		
 		/*
