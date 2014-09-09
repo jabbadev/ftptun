@@ -52,7 +52,8 @@ var createServer =  function(file,done){
 				secBuff = new Buffer(secret.toString("base64"),"base64");
 				res.write(localCipher.update(secBuff));
 				res.end(localCipher.final());
-			} else if ( req.url == "/chunk" ) {		
+			} else if ( req.url == "/chunk" && req.method == 'GET' ) {
+				res.writeHead(200,{'Content-Type': 'text/plain','Content-length': 1024 });
 				var start = parseInt((req.headers.range.split("-"))[0]);
 				var end = parseInt((req.headers.range.split("-"))[1]);
 				var chunk = fs.createReadStream(self.file,{
@@ -61,8 +62,11 @@ var createServer =  function(file,done){
 				});
 				chunk.on('data',function(data){ res.write(data); });
 				chunk.on('end',function(){ res.end(); });
-			} else if ( req.url == "/chunk-deferred") {
-				
+			} else if ( req.url == "/chunk" && req.method == 'HEAD') {
+				res.writeHead(200,{'Content-Type': 'text/plain','Content-length': 10240 });
+				res.end();
+			} else if ( req.url == "/chunk-deferred" && req.method == 'GET' ) {
+				res.writeHead(200,{'Content-Type': 'text/plain','Content-length': 1024 });
 				var start = parseInt((req.headers.range.split("-"))[0]),
 					end = parseInt((req.headers.range.split("-"))[1]),
 				 	chunk = fs.createReadStream(self.file,{
@@ -84,6 +88,9 @@ var createServer =  function(file,done){
 						res.end(dataToSend);
 					}
 				});
+			} else if ( req.url == "/chunk-deferred" && req.method == 'HEAD' ) {
+				res.writeHead(200,{'Content-Type': 'text/plain','Content-length': 10240 });
+				res.end();
 			} else if ( req.url == "/ptun" ) {
 				var bodyReq = "";
 				req.on('data',function(data){
@@ -103,6 +110,16 @@ var createServer =  function(file,done){
 				
 			} else if (req.url == "/size" && req.method == 'HEAD' ){
 				res.writeHead(200,{'content-length': 10240});
+				res.end();
+			} else if (req.url == "/undefined-size" && req.method == 'GET' ){
+				res.writeHead(200,{'Content-Type': 'text/plain'});
+				res.write('chunk 0');
+				setTimeout(function(){
+					res.write('chunk 1');
+					res.end();
+				},300);
+			} else if (req.url == "/undefined-size" && req.method == 'HEAD' ){
+				res.writeHead(200);
 				res.end();
 			}else {
 				res.writeHead(200,{'Content-Type': 'text/plain','Content-length': 10240 });
