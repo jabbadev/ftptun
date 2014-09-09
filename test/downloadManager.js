@@ -64,26 +64,7 @@ describe('DownloadManager',function(){
 			dm.start();
 		});
 		
-		/*
-		it('download chunk feature disabled',function(done){
-			var dm = new DownloadManager({
-				url: 'http://127.0.0.1:' + this.supWebServer.port,
-				disableProxy : true
-			});
-			
-			dm.on('data',function(pseudoChunk){
-				(pseudoChunk.data.length).should.eql(10240);
-				dm.status().totByte.should.eql(10240);
-			});
-			
-			dm.on('finish',function(){
-				done();
-			});
-			
-			dm.start();
-		});
-		*/
-		it('download chunk deferred',function(done){
+		it('deferred download',function(done){
 			
 			var dm = new DownloadManager({
 					workers: 3,
@@ -118,5 +99,27 @@ describe('DownloadManager',function(){
 			dm.start();
 			
 		});
+		
+		it('auto direct download',function(done){
+			var dm = new DownloadManager({
+				workers: 3,
+				chunkSize: 1024,
+				url: 'http://127.0.0.1:' + this.supWebServer.port + "/undefined-size",
+				disableProxy : true
+			});
+			
+			dm.on('data',function(chunk){
+				status = dm.status();
+				(typeof status.resSize == "undefined").should.be.ok;
+				chunk.data.toString().should.eql('undefined size resource');
+			});
+			
+			dm.on('finish',function(){
+				done();
+			});
+			
+			dm.start();
+		});
+
 	});
 });

@@ -111,6 +111,13 @@ var createServer =  function(file,done){
 			} else if (req.url == "/size" && req.method == 'HEAD' ){
 				res.writeHead(200,{'content-length': 10240});
 				res.end();
+			} else if (req.url == "/undefined-size" && req.method == 'GET' ){
+				res.writeHead(200,{'Content-Type': 'text/plain'});
+				res.write('undefined size resource');
+				res.end();
+			} else if (req.url == "/undefined-size" && req.method == 'HEAD' ){
+				res.writeHead(200);
+				res.end();
 			}else {
 				res.writeHead(200,{'Content-Type': 'text/plain','Content-length': 10240 });
 				var st = fs.createReadStream(self.file);
