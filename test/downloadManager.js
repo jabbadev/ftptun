@@ -29,7 +29,7 @@ describe('DownloadManager',function(){
 					chunkSize: 1024,
 					url: 'http://127.0.0.1:' + this.supWebServer.port ,
 					disableProxy : true,
-					chunkDisable: true
+					disableChunk: true
 			});
 			
 			dm.on('data',function(webRes){
