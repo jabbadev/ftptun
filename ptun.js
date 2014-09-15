@@ -35,8 +35,6 @@ function Main(conf){
 	
 	conf.url = cmdopt.args[0];
 	
-	console.log(conf);
-	
 	if (cmdopt.args[1]){
 		outStream = fs.WriteStream(cmdopt.args[1]);
 	} else if ( !cmdopt.args[1] && !cmdopt.stdout){
@@ -52,7 +50,7 @@ function Main(conf){
 		outStream.write(webRes.data);
 	});
 	dm.on('finish',function(webRes){
-		outStream.end();
+		outStream.end(webRes.data);
 	});
 	
 	dm.start();
