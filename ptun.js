@@ -7,12 +7,19 @@ var Config = require('./lib/clientInit.js'),
 	fs = require('fs'),
 	path = require('path');
 
+function chunkSize(cs){
+	if( cs[cs.length-1] == "M" ){
+		return parseInt(cs.replace(/M$/,''))*1000000; 
+	}
+	return parseInt(cs);
+}
+	
 cmdopt
 	.version('ptun [ 1.0.0 ]')
 	.usage('[Options] <url> [file]')
 	.option('--dp','skip proxy settings')
 	.option('--dc','disable chunk download feature')
-	.option('--cs <chunkSize>','Overwrite configured "chunkSize" value',parseInt)
+	.option('--cs <n[M]>','Overwrite configured "chunkSize" value [ es. 5M ]',chunkSize)
 	.option('--wn <workers>','Overwrite configured number download "workers"',parseInt)
 	.option('--et','Enable ptun tunnel')
 	.option('--stdout','stream to stdout')
@@ -27,7 +34,7 @@ function Main(conf){
 	
 	cmdopt.dp ? conf.disableProxy = cmdopt.dp : null;
 	cmdopt.dc ? conf.disableChunk = cmdopt.dc : null;
-	cmdopt.chunkSize ? conf.chunkSize = cmdopt.chunkSize : null;
+	cmdopt.cs ? conf.chunkSize = cmdopt.cs : null;
 	cmdopt.workers ? conf.workers = cmdopt.workers : null;
 	if(!cmdopt.et){
 		delete conf.ptun;
