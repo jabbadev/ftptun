@@ -47,7 +47,6 @@ function Main(conf){
 	
 	var dm = new DownloadManager(conf);
 	dm.on('data',function(webRes){
-		console.log('data size: ',webRes.data.length);
 		outStream.write(webRes.data);
 	});
 	dm.on('finish',function(webRes){
