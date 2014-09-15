@@ -54,12 +54,13 @@ var createServer =  function(file,done){
 				res.end(localCipher.final());
 			} else if ( req.url == "/chunk" && req.method == 'GET' ) {
 				res.writeHead(200,{'Content-Type': 'text/plain','Content-length': 1024 });
-				var start = parseInt((req.headers.range.split("-"))[0]);
-				var end = parseInt((req.headers.range.split("-"))[1]);
-				var chunk = fs.createReadStream(self.file,{
-					start: start,
-					end: end
-				});
+				var range = req.headers.range.replace("bytes=",""),
+					start = parseInt((range.split("-"))[0]),
+					end = parseInt((range.split("-"))[1]),
+					chunk = fs.createReadStream(self.file,{
+						start: start,
+						end: end
+					});
 				chunk.on('data',function(data){ res.write(data); });
 				chunk.on('end',function(){ res.end(); });
 			} else if ( req.url == "/chunk" && req.method == 'HEAD') {
@@ -67,8 +68,9 @@ var createServer =  function(file,done){
 				res.end();
 			} else if ( req.url == "/chunk-deferred" && req.method == 'GET' ) {
 				res.writeHead(200,{'Content-Type': 'text/plain','Content-length': 1024 });
-				var start = parseInt((req.headers.range.split("-"))[0]),
-					end = parseInt((req.headers.range.split("-"))[1]),
+				var range = req.headers.range.replace("bytes=",""),
+					start = parseInt((range.split("-"))[0]),
+					end = parseInt((range.split("-"))[1]),
 				 	chunk = fs.createReadStream(self.file,{
 						start: start,
 						end: end
