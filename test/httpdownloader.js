@@ -30,7 +30,8 @@ describe('HttpDownloader',function(){
 			var hd = new HttpDownloader({ url: 'http://127.0.0.1:'+ this.supWebServer.port + '/',
 										  disableProxy : true });
 			
-			hd.on('data',function(data){
+			hd.on('data',function(data,resInfo){
+				resInfo.dataSize.should.eql(10240);
 				bytes = bytes + data.length;
 			});
 		
