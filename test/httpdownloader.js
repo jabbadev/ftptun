@@ -27,7 +27,7 @@ describe('HttpDownloader',function(){
 	describe('#start()',function(){
 		it('start http docwnload',function(done){
 			var bytes = 0;
-			var hd = new HttpDownloader({ url: 'http://127.0.0.1:'+ this.supWebServer.port + '/',
+			var hd = new HttpDownloader({ url: 'http://127.0.0.1:'+ this.supWebServer.port + '/download-all',
 										  disableProxy : true });
 			
 			hd.on('data',function(data,resInfo){
@@ -122,12 +122,48 @@ describe('HttpDownloader',function(){
 					disableProxy : true
 				});
 				
-				hd.size(function(resInfo,error){
+				hd.resInfo(function(resInfo,error){
 					resInfo.size.should.eql(10240);
 					done();
 				});
 				
 			});
+		});
+		
+		describe('check resource size before download',function(done){
+			it('enable',function(done){
+				var hd = new HttpDownloader({ url: 'http://127.0.0.1:' + this.supWebServer.port + '/check-size',
+					  disableProxy : true });
+
+				hd.on('data',function(data,resInfo){
+					//console.log(data,resInfo);
+				});
+				
+				hd.on('end',function(data,resInfo){
+					//console.log(data,resInfo);
+					done();
+				});
+				
+				hd.start();
+			});
+			
+			/*
+			it('disable',function(done){
+				var hd = new HttpDownloader({ url: 'http://127.0.0.1:' + this.supWebServer.port + '/check-size',
+					  disableProxy : true });
+
+				hd.on('data',function(data,resInfo){
+					console.log(data,resInfo);
+				});
+				
+				hd.on('end',function(data,resInfo){
+					console.log(data,resInfo);
+					done();
+				});
+				
+				hd.start();
+			});
+			*/
 		});
 		
 	});

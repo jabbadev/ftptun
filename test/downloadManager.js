@@ -27,7 +27,7 @@ describe('DownloadManager',function(){
 			var dm = new DownloadManager({
 					workers: 3,
 					chunkSize: 1024,
-					url: 'http://127.0.0.1:' + this.supWebServer.port ,
+					url: 'http://127.0.0.1:' + this.supWebServer.port + "/download-all" ,
 					disableProxy : true,
 					disableChunk: true
 			});

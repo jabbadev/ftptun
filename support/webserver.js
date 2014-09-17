@@ -41,12 +41,12 @@ var createServer =  function(file,done){
 		var self = this;
 		this.port = port;
 		this.server = http.createServer(function (req,res){
-			if ( req.url == "/cipher" ) {
+			if ( req.url == "/cipher" && req.method == 'POST' ) {
 				var secret = new Buffer("This is a secret message");
 				var secBuff = new Buffer(secret.toString("base64"),"base64");
 				res.write(cipher.update(secBuff));
 				res.end(cipher.final());
-			} else if ( req.url == "/ptun_cipher") { 
+			} else if ( req.url == "/ptun_cipher" && req.method == 'GET' ) { 
 				var localCipher = crypto.createCipher('aes-256-cbc',"secret1234");
 				secret = new Buffer("ptun download");
 				secBuff = new Buffer(secret.toString("base64"),"base64");
@@ -93,6 +93,20 @@ var createServer =  function(file,done){
 			} else if ( req.url == "/chunk-deferred" && req.method == 'HEAD' ) {
 				res.writeHead(200,{'Content-Type': 'text/plain','Content-length': 10240 });
 				res.end();
+			} else if ( req.url == "/check-size" && req.method == 'GET' ) {
+				res.writeHead(200,{'Content-Type': 'text/plain','Content-length': 3000 });
+				
+				res.write(new Array(1001).join('a'));
+				setTimeout(function(){
+					res.write(new Array(1001).join('b'));
+				},100);
+				setTimeout(function(){
+					res.end(new Array(1001).join('c'));
+				},100);
+				
+			} else if ( req.url == "/check-size" && req.method == 'HEAD' ) {
+				res.writeHead(200,{'Content-Type': 'text/plain','Content-length': 3000 });
+				res.end();
 			} else if ( req.url == "/ptun" ) {
 				var bodyReq = "";
 				req.on('data',function(data){
@@ -123,7 +137,7 @@ var createServer =  function(file,done){
 			} else if (req.url == "/undefined-size" && req.method == 'HEAD' ){
 				res.writeHead(200);
 				res.end();
-			}else {
+			} else if ( req.url == "/download-all" && req.method == 'GET' ){
 				res.writeHead(200,{'Content-Type': 'text/plain','Content-length': 10240 });
 				var st = fs.createReadStream(self.file);
 				st.on('data',function(data){res.write(data);});

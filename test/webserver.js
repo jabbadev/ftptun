@@ -22,7 +22,7 @@ describe('Webserver, for test support',function(){
 	
 	describe('GET server status',function(done){
 		it('should return 200 http status',function(done){		
-			http.get("http://127.0.0.1:" + this.supWebServer.port , function(res) {
+			http.get("http://127.0.0.1:" + this.supWebServer.port + "/download-all", function(res) {
 			  (res.statusCode).should.equal(200);
 			  done();
 			});
