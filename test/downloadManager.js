@@ -23,6 +23,7 @@ describe('DownloadManager',function(){
 	});
 	
 	describe('DownloadManager',function(){
+		/*
 		it('direct download',function(done){
 			var dm = new DownloadManager({
 					workers: 3,
@@ -41,6 +42,7 @@ describe('DownloadManager',function(){
 			
 			dm.start();
 		});
+		*/
 		
 		it('chunk download',function(done){
 			var dm = new DownloadManager({
@@ -74,8 +76,8 @@ describe('DownloadManager',function(){
 			});
 			
 			dm.on('chunk',function(chunk){
-				/* the client get first chunk 1 then chunk 0
-				   the chunk 0 is the last */
+				// the client get first chunk 1 then chunk 0
+				//   the chunk 0 is the last 
 				if(chunk.cn == 0 ){
 					chunk.data.toString().should.eql((new Array(1025)).join('a'));
 					dm.status().totByte.should.eql(10240);

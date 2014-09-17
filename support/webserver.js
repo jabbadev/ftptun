@@ -8,8 +8,7 @@ var createServer =  function(file,done){
 	this.port = 8080;
 	this.file = file;
 	this.done = done;
-	var self = this,
-		cipher = crypto.createCipher('aes-256-cbc',"secret1234");
+	var self = this;
 	
 	var f = fs.createWriteStream(this.file);
 	f.on('open',function(){
@@ -41,17 +40,28 @@ var createServer =  function(file,done){
 		var self = this;
 		this.port = port;
 		this.server = http.createServer(function (req,res){
-			if ( req.url == "/cipher" && req.method == 'POST' ) {
+			
+			if ( req.url == "/cipher" && req.method == 'HEAD' ) {
+				res.writeHead(200,{'Content-Type': 'text/plain','Content-length': 24 });
+				res.end();
+			} else if ( req.url == "/cipher" && req.method == 'POST' ) {
 				var secret = new Buffer("This is a secret message");
 				var secBuff = new Buffer(secret.toString("base64"),"base64");
-				res.write(cipher.update(secBuff));
-				res.end(cipher.final());
-			} else if ( req.url == "/ptun_cipher" && req.method == 'GET' ) { 
 				var localCipher = crypto.createCipher('aes-256-cbc',"secret1234");
-				secret = new Buffer("ptun download");
-				secBuff = new Buffer(secret.toString("base64"),"base64");
 				res.write(localCipher.update(secBuff));
 				res.end(localCipher.final());
+			} else if ( req.url == "/ptun_cipher" && req.method == 'HEAD' ) {
+				res.writeHead(200,{'Content-Type': 'text/plain','Content-length': 24 });
+				res.end();
+			} else if ( req.url == "/ptun_cipher" && req.method == 'GET' ) { 
+				secret = new Buffer("ptun download");
+				secBuff = new Buffer(secret.toString("base64"),"base64");
+				var localCipher = crypto.createCipher('aes-256-cbc',"secret1234");
+				res.write(localCipher.update(secBuff));
+				res.end(localCipher.final());
+			} else if ( req.url == "/chunk" && req.method == 'HEAD' ) {
+				res.writeHead(200,{'Content-Type': 'text/plain','Content-length': 1024 });
+				res.end();
 			} else if ( req.url == "/chunk" && req.method == 'GET' ) {
 				res.writeHead(200,{'Content-Type': 'text/plain','Content-length': 1024 });
 				var range = req.headers.range.replace("bytes=",""),
@@ -136,6 +146,9 @@ var createServer =  function(file,done){
 				},300);
 			} else if (req.url == "/undefined-size" && req.method == 'HEAD' ){
 				res.writeHead(200);
+				res.end();
+			} else if ( req.url == "/download-all" && req.method == 'HEAD' ){
+				res.writeHead(200,{'Content-Type': 'text/plain','Content-length': 10240 });
 				res.end();
 			} else if ( req.url == "/download-all" && req.method == 'GET' ){
 				res.writeHead(200,{'Content-Type': 'text/plain','Content-length': 10240 });
