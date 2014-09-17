@@ -144,11 +144,11 @@ describe('HttpDownloader',function(){
 				  disableProxy : true });
 
 			hd.on('data',function(data,resInfo){
-				console.log(data,resInfo);
+				
 			});
 			
 			hd.on('end',function(data,resInfo){
-				console.log(data,resInfo);
+				
 				done();
 			});
 			
