@@ -117,7 +117,7 @@ describe('HttpDownloader',function(){
 			});
 			
 			hd.resInfo(function(resInfo,error){
-				resInfo.size.should.eql(10240);
+				resInfo.resSize.should.eql(10240);
 				done();
 			});
 			
@@ -125,14 +125,21 @@ describe('HttpDownloader',function(){
 		
 		it('check resInfo enable',function(done){
 			var hd = new HttpDownloader({ url: 'http://127.0.0.1:' + this.supWebServer.port + '/check-size',
-				  disableProxy : true });
-
+				  disableProxy : true }),
+				cont = 0,
+				self = this;
+			
 			hd.on('data',function(data,resInfo){
-				//console.log(data,resInfo);
+				cont++;
+				if ( cont == 2 ){
+					resInfo.should.eql({ url: 'http://127.0.0.1:' + self.supWebServer.port + '/check-size',
+						  resSize: 3000,
+						  dataSize: 1000,
+						  resChunkSize: null });
+				}
 			});
 			
 			hd.on('end',function(data,resInfo){
-				//console.log(data,resInfo);
 				done();
 			});
 			
@@ -141,14 +148,25 @@ describe('HttpDownloader',function(){
 		
 		it('check resInfo disable',function(done){
 			var hd = new HttpDownloader({ url: 'http://127.0.0.1:' + this.supWebServer.port + '/check-size',
-				  disableProxy : true });
+				  disableProxy : true, disableResInfo: true }),
+				cont = 0,
+				self = this;
 
 			hd.on('data',function(data,resInfo){
-				
+				cont++;
+				if ( cont == 2 ){
+					resInfo.should.eql({ url: null,
+						  resSize: null,
+						  dataSize: 1000,
+						  resChunkSize: null });
+				}
 			});
 			
 			hd.on('end',function(data,resInfo){
-				
+				resInfo.should.eql({ url: 'http://127.0.0.1:' + self.supWebServer.port + '/check-size',
+					  resSize: 3000,
+					  dataSize: null,
+					  resChunkSize: null });
 				done();
 			});
 			

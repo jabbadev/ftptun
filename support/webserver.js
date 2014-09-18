@@ -72,10 +72,7 @@ var createServer =  function(file,done){
 						end: end
 					});
 				chunk.on('data',function(data){ res.write(data); });
-				chunk.on('end',function(){ res.end(); });
-			} else if ( req.url == "/chunk" && req.method == 'HEAD') {
-				res.writeHead(200,{'Content-Type': 'text/plain','Content-length': 10240 });
-				res.end();
+				chunk.on('end',function(){ res.end(); });	
 			} else if ( req.url == "/chunk-deferred" && req.method == 'GET' ) {
 				res.writeHead(200,{'Content-Type': 'text/plain','Content-length': 1024 });
 				var range = req.headers.range.replace("bytes=",""),
@@ -112,7 +109,7 @@ var createServer =  function(file,done){
 				},100);
 				setTimeout(function(){
 					res.end(new Array(1001).join('c'));
-				},100);
+				},200);
 				
 			} else if ( req.url == "/check-size" && req.method == 'HEAD' ) {
 				res.writeHead(200,{'Content-Type': 'text/plain','Content-length': 3000 });
