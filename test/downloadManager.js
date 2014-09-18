@@ -23,7 +23,7 @@ describe('DownloadManager',function(){
 	});
 	
 	describe('DownloadManager',function(){
-		/*
+		
 		it('direct download',function(done){
 			var dm = new DownloadManager({
 					workers: 3,
@@ -42,7 +42,6 @@ describe('DownloadManager',function(){
 			
 			dm.start();
 		});
-		*/
 		
 		it('chunk download',function(done){
 			var dm = new DownloadManager({
