@@ -135,8 +135,7 @@ describe('HttpDownloader',function(){
 					resInfo.should.eql({ url: 'http://127.0.0.1:' + self.supWebServer.port + '/check-size',
 						  resSize: 3000,
 						  dataSize: 1000,
-						  resChunkSize: null,
-						  chunk: null });
+						  chunkInfo: null });
 				}
 			});
 			
@@ -159,8 +158,7 @@ describe('HttpDownloader',function(){
 					resInfo.should.eql({ url: null,
 						  resSize: null,
 						  dataSize: 1000,
-						  resChunkSize: null,
-						  chunk: null });
+						  chunkInfo: null });
 				}
 			});
 			
@@ -168,8 +166,7 @@ describe('HttpDownloader',function(){
 				resInfo.should.eql({ url: 'http://127.0.0.1:' + self.supWebServer.port + '/check-size',
 					  resSize: 3000,
 					  dataSize: null,
-					  resChunkSize: null,
-					  chunk: null });
+					  chunkInfo: null });
 				done();
 			});
 			
