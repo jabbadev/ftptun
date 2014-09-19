@@ -53,11 +53,11 @@ function Main(conf){
 	outStream.on('finish',function(){outStream.close();});
 	
 	var dm = new DownloadManager(conf);
-	dm.on('data',function(webRes){
-		outStream.write(webRes.data);
+	dm.on('data',function(data,resInfo){
+		outStream.write(data);
 	});
-	dm.on('finish',function(webRes){
-		( webRes.data ) && outStream.end(webRes.data);
+	dm.on('finish',function(data,resInfo){
+		( data ) && outStream.end(data);
 	});
 	
 	dm.start();

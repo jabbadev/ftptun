@@ -51,12 +51,12 @@ describe('DownloadManager',function(){
 				disableProxy : true
 			});
 		
-			dm.on('data',function(webRes){
-				if(webRes.cn == 0 ){
-					webRes.data.toString().should.eql((new Array(1025)).join('a'));
+			dm.on('data',function(data,resInfo){
+				if(resInfo.chunkInfo.cn == 0 ){
+					data.toString().should.eql((new Array(1025)).join('a'));
 				}
-				if(webRes.cn == 1 ){
-					webRes.data.toString().should.eql((new Array(1025)).join('b'));
+				if(resInfo.chunkInfo.cn == 1 ){
+					data.toString().should.eql((new Array(1025)).join('b'));
 				}
 			});
 			dm.on('finish',function(){
@@ -74,21 +74,21 @@ describe('DownloadManager',function(){
 					disableProxy : true
 			});
 			
-			dm.on('chunk',function(chunk){
+			dm.on('chunk',function(data,resInfo){
 				// the client get first chunk 1 then chunk 0
 				//   the chunk 0 is the last 
-				if(chunk.cn == 0 ){
-					chunk.data.toString().should.eql((new Array(1025)).join('a'));
+				if(resInfo.chunkInfo.cn == 0 ){
+					data.toString().should.eql((new Array(1025)).join('a'));
 					dm.status().totByte.should.eql(10240);
 				}
-				if(chunk.cn == 1 ){
-					chunk.data.toString().should.eql((new Array(1025)).join('b'));
+				if(resInfo.chunkInfo.cn == 1 ){
+					data.toString().should.eql((new Array(1025)).join('b'));
 					dm.status().totByte.should.eql(1024);
 				}
 			});
 			
-			dm.on('data',function(chunk){
-				if(chunk.cn == 0 ){
+			dm.on('data',function(data,resInfo){
+				if(resInfo.chunkInfo.cn == 0 ){
 					dm.status().totByte.should.eql(10240);
 				}
 			});
@@ -110,11 +110,11 @@ describe('DownloadManager',function(){
 				disableProxy : true
 			});
 			
-			dm.on('data',function(chunk){
+			dm.on('data',function(data,resInfo){
 				status = dm.status();
 				(typeof status.resSize == "undefined").should.be.ok;
-				if ( cont == 0 )	chunk.data.toString().should.eql('chunk 0');
-				if ( cont == 1 )	chunk.data.toString().should.eql('chunk 1');
+				if ( cont == 0 )	data.toString().should.eql('chunk 0');
+				if ( cont == 1 )	data.toString().should.eql('chunk 1');
 				cont++;
 			});
 			
