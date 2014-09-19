@@ -33,8 +33,8 @@ describe('DownloadManager',function(){
 					disableChunk: true
 			});
 			
-			dm.on('data',function(webRes){
-				webRes.data.length.should.eql(10240);
+			dm.on('data',function(data,resInfo){
+				data.length.should.eql(10240);
 			});
 			dm.on('finish',function(){
 				done();
