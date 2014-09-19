@@ -57,7 +57,12 @@ function Main(conf){
 		outStream.write(data);
 	});
 	dm.on('finish',function(data,resInfo){
-		( data ) && outStream.end(data);
+		if( data ){
+			outStream.end(data);
+		}
+	});
+	dm.on('checkDownload',function(resInfo){
+		console.log('%d/%d',resInfo.resSize,resInfo.downloadedByte);
 	});
 	
 	dm.start();
