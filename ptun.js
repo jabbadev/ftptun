@@ -5,7 +5,8 @@ var Config = require('./lib/clientInit.js'),
 	cmdopt = require('commander');
 	URL = require('url'),
 	fs = require('fs'),
-	path = require('path');
+	path = require('path'),
+	util = require('util');
 
 function chunkSize(cs){
 	if( cs[cs.length-1] == "M" ){
@@ -27,6 +28,24 @@ cmdopt
 
 clientConf = new Config();
 clientConf.loadConfig(Main);
+
+var showInfo = (function formatInfo(){
+	var oldResInfo = {},
+		t1 = new Date().getTime();
+	return function(resInfo){
+		if( !(oldResInfo.resSize == resInfo.resSize && oldResInfo.downloadedByte == resInfo.downloadedByte) ){
+			var perc = util.inspect(100*resInfo.downloadedByte/resInfo.resSize),
+				t2 = new Date().getTime(); 
+			
+			console.log('Byte: [ %d/%d ] Percentage: [ %d\% ] Speed: [ %d Mb/s ]',
+				resInfo.downloadedByte,
+				resInfo.resSize,perc.substring(0,5),
+				(((resInfo.downloadedByte*8)/((t2-t1)/1000))/1000000).toFixed(3)
+			);
+			oldResInfo = resInfo;
+		}
+	};
+})();
 
 function Main(conf){
 	var outStream = null,
@@ -61,9 +80,7 @@ function Main(conf){
 			outStream.end(data);
 		}
 	});
-	dm.on('checkDownload',function(resInfo){
-		console.log('%d/%d',resInfo.resSize,resInfo.downloadedByte);
-	});
+	dm.on('checkDownload',showInfo);
 	
 	dm.start();
 };
