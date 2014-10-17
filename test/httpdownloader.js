@@ -178,7 +178,8 @@ describe('HttpDownloader',function(){
 			var hd = new HttpDownloader({ url: 'http://127.0.0.1:' + this.supWebServer.port + '/error',
 				  disableProxy : true, disableResInfo: true });
 
-			hd.on('error',function(error,response){
+			hd.on('error',function(error,response,resInfo){
+				console.log('error resinfo ', resInfo);
 				response.statusCode.should.eql(500);
 				done();
 			});

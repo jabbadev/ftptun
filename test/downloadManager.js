@@ -124,6 +124,39 @@ describe('DownloadManager',function(){
 			
 			dm.start();
 		});
+		
+		it('direct download error',function(done){
+			var dm = new DownloadManager({
+				workers: 3,
+				chunkSize: 1024,
+				url: 'http://127.0.0.1:' + this.supWebServer.port + "/error",
+				disableProxy : true,
+				disableChunk: true
+			});
+			
+			dm.on('error',function(error,response){
+				response.statusCode.should.eql(500);
+				done();
+			});
+			
+			dm.start();
+		});
+		
+		it('chunk download error',function(done){
+			var dm = new DownloadManager({
+				workers: 3,
+				chunkSize: 1024,
+				url: 'http://127.0.0.1:' + this.supWebServer.port + "/error-chunk" ,
+				disableProxy : true
+			});
+		
+			dm.on('error',function(error,response){
+				console.log(response.statusCode);
+				done();
+			});
+			
+			dm.start();
+		});
 
 	});
 });
