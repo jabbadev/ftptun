@@ -156,6 +156,10 @@ describe('DownloadManager',function(){
 				done();
 			});
 			
+			dm.on('finish',function(){
+				done();
+			});
+			
 			dm.start();
 		});
 

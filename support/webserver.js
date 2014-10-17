@@ -185,6 +185,12 @@ var createServer =  function(file,done){
 					res.writeHead(500,"chunk [ 3072-4095 ] in error");
 					res.end();
 				}
+			} else if ( req.url == "/chunk-in-error" && req.method == 'HEAD' ) {
+				res.writeHead(200,{'Content-Type': 'text/plain','Content-length': 1024 });
+				res.end();
+			} else if ( req.url == "/chunk-in-error" && req.method == 'GET' ) {
+				res.writeHead(500,"download chunk in error");
+				res.end();
 			}
 			
 		}).listen(this.port,"127.0.0.1",function(){self.done(self);});

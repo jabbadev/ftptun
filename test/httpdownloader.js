@@ -199,5 +199,20 @@ describe('HttpDownloader',function(){
 			hd.start();
 		});
 		
+		it('chunk download in error',function(done){
+			var hd = new HttpDownloader({ url: 'http://127.0.0.1:' + this.supWebServer.port + '/chunk-in-error',
+										  disableProxy : true,
+									      chunk: { start: 1024, end: 2047 } });
+
+			hd.on('error',function(error,response,resInfo){
+				response.statusCode.should.eql(500);
+				resInfo.chunkInfo.should.eql({ start: 1024, end: 2047 });
+				done();
+			});
+		
+			hd.start();
+			
+		});
+		
 	});
 });
