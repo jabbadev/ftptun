@@ -173,5 +173,31 @@ describe('HttpDownloader',function(){
 			hd.start();
 		});
 		
+		it('failed download',function(done){
+			
+			var hd = new HttpDownloader({ url: 'http://127.0.0.1:' + this.supWebServer.port + '/error',
+				  disableProxy : true, disableResInfo: true });
+
+			hd.on('error',function(error,response){
+				response.statusCode.should.eql(500);
+				done();
+			});
+			
+			hd.start();
+		});
+		
+		it('error request',function(done){
+			
+			var hd = new HttpDownloader({ url: 'fake_protocol://127.0.0.1:' + this.supWebServer.port + '/error',
+				  disableProxy : true, disableResInfo: true });
+
+			hd.on('error',function(error,response){
+				error.message.should.eql('Invalid protocol: null');
+				done();
+			});
+			
+			hd.start();
+		});
+		
 	});
 });

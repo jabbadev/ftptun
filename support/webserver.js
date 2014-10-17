@@ -156,7 +156,11 @@ var createServer =  function(file,done){
 						res.end();
 					});
 				});
+			} else if( req.url == "/error" && req.method == 'GET' ) {
+				res.writeHead(500,"In error method");
+				res.end();
 			}
+			
 		}).listen(this.port,"127.0.0.1",function(){self.done(self);});
 	};
 	
