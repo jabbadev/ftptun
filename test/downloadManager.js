@@ -126,7 +126,7 @@ describe('DownloadManager',function(){
 		});
 		
 		it('direct download error',function(done){
-			var dm = new DownloadManager({
+			var self = this, dm = new DownloadManager({
 				workers: 3,
 				chunkSize: 1024,
 				url: 'http://127.0.0.1:' + this.supWebServer.port + "/error",
@@ -134,7 +134,8 @@ describe('DownloadManager',function(){
 				disableChunk: true
 			});
 			
-			dm.on('error',function(error,response){
+			dm.on('error',function(error,response,resInfo){
+				resInfo.url.should.eql('http://127.0.0.1:' + self.supWebServer.port + "/error");
 				response.statusCode.should.eql(500);
 				done();
 			});
@@ -150,8 +151,8 @@ describe('DownloadManager',function(){
 				disableProxy : true
 			});
 		
-			dm.on('error',function(error,response){
-				console.log(response.statusCode);
+			dm.on('error',function(error,response,resInfo){
+				console.log(response.statusCode,resInfo);
 				done();
 			});
 			

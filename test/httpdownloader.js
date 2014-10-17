@@ -179,7 +179,6 @@ describe('HttpDownloader',function(){
 				  disableProxy : true, disableResInfo: true });
 
 			hd.on('error',function(error,response,resInfo){
-				console.log('error resinfo ', resInfo);
 				response.statusCode.should.eql(500);
 				done();
 			});

@@ -181,6 +181,7 @@ var createServer =  function(file,done){
 					chunk.on('end',function(){ res.end(); });
 				}
 				else {
+					console.log('DEBUG: ',req.headers.range);
 					res.writeHead(500,"chunk [ 3072-4095 ] in error");
 					res.end();
 				}
