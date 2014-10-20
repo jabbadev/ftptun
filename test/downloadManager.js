@@ -137,6 +137,9 @@ describe('DownloadManager',function(){
 			dm.on('error',function(error,response,resInfo){
 				resInfo.url.should.eql('http://127.0.0.1:' + self.supWebServer.port + "/error");
 				response.statusCode.should.eql(500);
+			});
+			
+			dm.on('finish',function(){
 				done();
 			});
 			
@@ -152,8 +155,7 @@ describe('DownloadManager',function(){
 			});
 		
 			dm.on('error',function(error,response,resInfo){
-				console.log(response.statusCode,resInfo);
-				done();
+				resInfo.chunkInfo.should.eql({ start: 3072, end: 4095 });
 			});
 			
 			dm.on('finish',function(){

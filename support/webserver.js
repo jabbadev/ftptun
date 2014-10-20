@@ -166,13 +166,12 @@ var createServer =  function(file,done){
 				res.writeHead(200,{'Content-Type': 'text/plain','Content-length': 10240 });
 				res.end();
 			} else if ( req.url == "/error-chunk" && req.method == 'GET' ) {
-				res.writeHead(200,{'Content-Type': 'text/plain','Content-length': 1024 });
-				
 				var range = req.headers.range.replace("bytes=",""),
 					start = parseInt((range.split("-"))[0]),
 					end = parseInt((range.split("-"))[1]);
 					
 				if ( start != 3072 ){
+					res.writeHead(200,{'Content-Type': 'text/plain','Content-length': 1024 });
 					var chunk = fs.createReadStream(self.file,{
 						start: start,
 						end: end
@@ -181,7 +180,6 @@ var createServer =  function(file,done){
 					chunk.on('end',function(){ res.end(); });
 				}
 				else {
-					console.log('DEBUG: ',req.headers.range);
 					res.writeHead(500,"chunk [ 3072-4095 ] in error");
 					res.end();
 				}
