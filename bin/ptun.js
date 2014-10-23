@@ -1,7 +1,7 @@
 #!/bin/env node
 
-var Config = require('./lib/clientInit.js'),
-	DownloadManager = require('./lib/downloadManager.js'),
+var Config = require('../lib/clientInit.js'),
+	DownloadManager = require('../lib/downloadManager.js'),
 	cmdopt = require('commander');
 	URL = require('url'),
 	fs = require('fs'),
