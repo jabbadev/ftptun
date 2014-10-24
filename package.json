@@ -11,6 +11,6 @@
     "commander": "^2.3.0"
   },
   "bin": {
-    "ptun": "bin/ptun"
+    "ptun": "bin/ptun.js"
   }
 }
