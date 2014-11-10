@@ -88,6 +88,28 @@ describe('HttpDownloader',function(){
 			
 		});
 		
+		it('using ptun no cipher',function(done){
+			var secMsg = "";
+			var hd = new HttpDownloader({ url: 'http://127.0.0.1:' + this.supWebServer.port + '/ptun_no_cipher',
+				  						  disableProxy : true,
+									      ptun: { "server": "http://127.0.0.1:" + this.supWebServer.port + "/ptun" } });
+
+			hd.on('data',function(data){
+				secMsg = secMsg + data.toString();
+			});
+	
+			hd.on('end',function(data,resInfo){
+				if(data != null){
+					secMsg = secMsg + data.toString();
+				}
+				secMsg.should.eql("ptun download no cipher");
+				done();
+			});
+		
+			hd.start();
+			
+		});
+		
 		it('chunk download',function(done){
 			var secMsg = "";
 			var hd = new HttpDownloader({ url: 'http://127.0.0.1:' + this.supWebServer.port + '/chunk',

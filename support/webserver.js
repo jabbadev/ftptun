@@ -59,6 +59,13 @@ var createServer =  function(file,done){
 				var localCipher = crypto.createCipher('aes-256-cbc',"secret1234");
 				res.write(localCipher.update(secBuff));
 				res.end(localCipher.final());
+				
+			} else if ( req.url == "/ptun_no_cipher" && req.method == 'HEAD' ) {
+				res.writeHead(200,{'Content-Type': 'text/plain','Content-length': 23 });
+				res.end();
+			} else if ( req.url == "/ptun_no_cipher" && req.method == 'GET' ) { 
+				res.write("ptun download no cipher");
+				res.end();
 			} else if ( req.url == "/chunk" && req.method == 'HEAD' ) {
 				res.writeHead(200,{'Content-Type': 'text/plain','Content-length': 1024 });
 				res.end();
